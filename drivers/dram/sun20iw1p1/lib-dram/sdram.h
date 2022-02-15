@@ -1,5 +1,41 @@
 // SPDX-License-Identifier: GPL-2.0+
+/*
+typedef struct __DRAM_PARA
+{
+    //normal configuration
+    unsigned int  dram_clk;	// 0x00
+    unsigned int  dram_type;	// 0x04
+    unsigned int  dram_zq;	// 0x08
+    unsigned int  dram_odt_en;	// 0x0c
 
+    //control configuration
+    unsigned int  dram_para1;	// 0x10
+    unsigned int  dram_para2;	// 0x14
+
+    //timing configuration
+    unsigned int  dram_mr0;	// 0x18
+    unsigned int  dram_mr1;	// 0x1c
+    unsigned int  dram_mr2;	// 0x20
+    unsigned int  dram_mr3;	// 0x24
+    unsigned int  dram_tpr0;	// 0x28 DRAMTMG0
+    unsigned int  dram_tpr1;	// 0x2c DRAMTMG1
+    unsigned int  dram_tpr2;	// 0x30 DRAMTMG2
+    unsigned int  dram_tpr3;	// 0x34 DRAMTMG3
+    unsigned int  dram_tpr4;	// 0x38 DRAMTMG4
+    unsigned int  dram_tpr5;	// 0x3c DRAMTMG5
+    unsigned int  dram_tpr6;	// 0x40 DRAMTMG8
+
+    //reserved for future use
+    unsigned int  dram_tpr7;	// 0x44
+    unsigned int  dram_tpr8;	// 0x48
+    unsigned int  dram_tpr9;	// 0x4c
+    unsigned int  dram_tpr10;	// 0x50
+    unsigned int  dram_tpr11;	// 0x54
+    unsigned int  dram_tpr12;	// 0x58
+    unsigned int  dram_tpr13;	// 0x5c
+
+} __dram_para_t;
+*/
 /*
  * dram_para1 bits:
  *  16-19 = page size
@@ -23,7 +59,35 @@
  *     19 = 2T or 1T
  *  23-24 = ranks code (again?)
  */
-
+/*
+__dram_para_t nezha_dram =
+{
+    0x00000318,	// dram_clk
+    0x00000003,	// dram_type
+    0x007b7bfb,	// dram_zq
+    0x00000001,	// dram_odt_en
+    0x000010d2,	// dram_para1
+    0x00000000,	// dram_para2
+    0x00001c70,	// dram_mr0
+    0x00000042, // dram_mr1
+    0x00000018, // dram_mr2
+    0x00000000, // dram_mr3
+    0x004a2195, // dram_tpr0
+    0x02423190, // dram_tpr1
+    0x0008b061, // dram_tpr2
+    0xb4787896, // dram_tpr3
+    0x00000000, // dram_tpr4
+    0x48484848, // dram_tpr5
+    0x00000048, // dram_tpr6
+    0x1620121e, // dram_tpr7
+    0x00000000, // dram_tpr8
+    0x00000000, // dram_tpr9
+    0x00000000, // dram_tpr10
+    0x00870000, // dram_tpr11
+    0x00000024, // dram_tpr12
+    0x34050100, // dram_tpr13
+};
+*/
 #define DRAM_MR0	((void*)0x3103030)
 #define DRAM_MR1	((void*)0x3103034)
 #define DRAM_MR2	((void*)0x3103038)
@@ -44,3 +108,9 @@
 #define PTR4           	((void*)0x3103054)
 #define RFSHTMG        	((void*)0x3103090)
 #define RFSHCTL1       	((void*)0x3103094)
+/*
+void __usdelay(unsigned long long);
+unsigned int readl(unsigned int);
+void writel(unsigned int, unsigned int);
+int printf(char *, ...);
+*/

@@ -2,6 +2,10 @@
 
 #include <common.h>
 #include <arch/dram_v2.h>
+/*
+#include <asm/io.h>
+#include <arch/boot0.h>
+*/
 
 #include "sdram.h"
 
@@ -10,6 +14,11 @@
 
 #define readl(x)	rv_readl((const volatile void __iomem *)(intptr_t)(x))
 #define writel(x, v)	rv_writel(v, (volatile void __iomem *)(intptr_t)(x))
+
+/*
+#define readl read32
+#define writel write32
+*/
 
 int set_ddr_voltage(int val)
 {
@@ -44,21 +53,90 @@ void dram_udelay(unsigned int d1)
 	return;
 }
 
+/**
+ * D1 manual p152 3.4 System Configuration
+ *
+ * SYS_CFG Base Address 0x03000000
+ *
+ * | Register Name       | Offset | Description                              |
+ * | ------------------- | ------ | ---------------------------------------- |
+ * | DSP_BOOT_RAMMAP_REG | 0x0008 | DSP Boot SRAM Remap Control Register     |
+ * | VER_REG             | 0x0024 | Version Register                         |
+ * | EMAC_EPHY_CLK_REG0  | 0x0030 | EMAC-EPHY Clock Register 0               |
+ * | SYS_LDO_CTRL_REG    | 0x0150 | System LDO Control Register              |
+ * | RESCAL_CTRL_REG     | 0x0160 | Resistor Calibration Control Register    |
+ * | RES240_CTRL_REG     | 0x0168 | 240ohms Resistor Manual Control Register |
+ * | RESCAL_STATUS_REG   | 0x016C | Resistor Calibration Status Register     |
+ */
+
+#define SYS_CFG ((char*)0x03000000) // 0x0300)0000 - 0x0300_0FFF
+#define VER_REG ((char*)SYS_CFG + 0x0024)
+#define EMAC_EPHY_CLK_REG0 ((char*)SYS_CFG + 0x0030)
+#define SYS_LDO_CTRL_REG ((char*)SYS_CFG + 0x0150)
+#define RES_CAL_CTRL_REG ((char*)SYS_CFG + 0x0160)
+#define RES240_CTRL_REG ((char*)SYS_CFG + 0x0168)
+#define RES_CAL_STATUS_REG ((char*)SYS_CFG + 0x016c)
+
+#define ZQ_VALUE ((char*)SYS_CFG + 0x0172)
+#define ZQ_INTERNAL ((char*)SYS_CFG + 0x016e)
+
+#define FOO_BASE ((char*)0x7010000) // TODO: What do we call this?
+#define ANALOG_SYS_PWROFF_GATING_REG ((char*)FOO_BASE + 0x0254)
+
+// NOTE: MSI shares the bus clock with CE, DMAC, IOMMU and CPU_SYS; p 38
+// TODO: Define *_BASE?
+#define MSI_MEMC_BASE ((char*)0x3102000) // p32 0x0310_2000 - 0x0330_1FFF
+#define MC_WORK_MODE_RANK0_LOW  ((char*)MSI_MEMC_BASE)
+#define MC_WORK_MODE_RANK0_HIGH ((char*)MSI_MEMC_BASE + 0x0004)
+#define MC_WORK_MODE_RANK1_LOW  ((char*)MSI_MEMC_BASE + 0x100000)
+#define MC_WORK_MODE_RANK1_HIGH ((char*)MSI_MEMC_BASE + 0x100004)
+#define UNKNOWN1 ((char*)MSI_MEMC_BASE + 0x0008) // 0x3102008
+#define UNKNOWN7 ((char*)MSI_MEMC_BASE + 0x000c) // 0x310200c
+#define UNKNOWN6 ((char*)MSI_MEMC_BASE + 0x0100) // 0x3102100
+
+// TODO:
+// 0x3102200
+// 0x3102210
+// 0x3102214
+// 0x3102230
+// 0x3102234
+// 0x3102240
+// 0x3102244
+// 0x3102260
+// 0x3102264
+// 0x3102290
+// 0x3102294
+// 0x3102470
+// 0x3102474
+// 0x31031c0
+// 0x31031c8
+// 0x31031d0
+#define MCTL_CLK_EN ((char*)MSI_MEMC_BASE + 0x100c) // 0x310300C
+#define UNKNOWN3 ((char*)MSI_MEMC_BASE + 0x1010) // 0x3103010
+// DATX0IOCR x + 4 * size
+// DATX0IOCR - DATX3IOCR: 11 registers per block, blocks 0x20 words apart
+#define DATX0IOCR  ((char*)MSI_MEMC_BASE + 0x0310) // 0x3102310
+#define DATX3IOCR  ((char*)MSI_MEMC_BASE + 0x0510) // 0x3102510
+#define IOCVR_LOW  ((char*)MSI_MEMC_BASE + 0x1110) // 0x3103110
+#define IOCVR_HIGH ((char*)MSI_MEMC_BASE + 0x1114) // 0x3103114
+#define UNKNOWN4 ((char*)MSI_MEMC_BASE + 0x1348) // 0x3103348
+#define UNKNOWN5 ((char*)MSI_MEMC_BASE + 0x13c8) // 0x31033C8
+
 void dram_vol_set(dram_para_t *para)
 {
 	int reg, vol = 0;
 
 	switch( para->dram_type ) {
-	case 2:  vol = 47; break;
-	case 3:  vol = 25; break;
+	case 2:  vol = 47; break; // 1.8V
+	case 3:  vol = 25; break; // 1.5V
 	default: vol = 0;
 	}
 vol = 25; // XXX
-	reg = readl(0x3000150);
+	reg = readl(SYS_LDO_CTRL_REG);
 	reg &= ~(0xff00);
 	reg |= vol << 8;
 	reg &= ~(0x200000);
-	writel(0x3000150, reg);
+	writel(SYS_LDO_CTRL_REG, reg);
 
 	sdelay(1);
 }
@@ -71,6 +149,8 @@ void paraconfig(unsigned int *para, unsigned int mask, unsigned int value)
 
 
 void dram_enable_all_master(void)
+// p32 memory mapping
+// MSI + MEMC: 0x0310_2000 - 0x0330_1fff
 {
 	writel(0x3102020, -1);
 	writel(0x3102024, 0xff);
@@ -192,13 +272,13 @@ void bit_delay_compensation(void)
 		5, 5, 6, 6, 4, 5, 3, 3, 3, 3, 3,
 	};
 
-	unsigned int *start = (unsigned int *)0x3102310; // DATX0IOCR
-	unsigned int *end   = (unsigned int *)0x3102510; // DATX0IOCR x + 4 * size
+	unsigned int *start = (unsigned int *)DATX0IOCR; // DATX0IOCR
+	unsigned int *end   = (unsigned int *)DATX3IOCR; // DATX0IOCR x + 4 * size
 	unsigned int *datxiocr;
 	unsigned int i, j, k, rval;
 
-	rval = readl(0x3102100) & 0x03ffffff;
-	writel(0x3102100, rval);
+	rval = readl(UNKNOWN6) & 0x03ffffff;
+	writel(UNKNOWN6, rval);
 
 	// Fill DATX0IOCR - DATX3IOCR, 11 registers per block, blocks 0x20 words apart
 	for(i = 0, datxiocr = start; datxiocr != end; i += 11, datxiocr += 0x20) {
@@ -210,8 +290,8 @@ void bit_delay_compensation(void)
 		}
 	}
 
-	rval = readl(0x3102100) | 0x04000000;
-	writel(0x3102100, rval);
+	rval = readl(UNKNOWN6) | 0x04000000;
+	writel(UNKNOWN6, rval);
 }
 
 // Not used ??
@@ -220,9 +300,9 @@ void set_master_priority_pad(dram_para_t *para)
 {
 	unsigned int val;
 
-	val = readl(0x310200c) & 0xfffff000;
+	val = readl(UNKNOWN7) & 0xfffff000;
 	val |= (para->dram_clk >> 1) - 1;
-	writel(0x310200c, val);
+	writel(UNKNOWN7, val);
 
 	writel(0x3102200, 0x00001000);
 	writel(0x3102210, 0x01000009);
@@ -448,6 +528,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 	switch (type) {
 
 	case 2:	// DDR2
+//	L59:
 		{
 		trasmax = freq / 30;
 		if (freq < 409) {
@@ -482,6 +563,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 	}
 
 	case 3:	// DDR3
+//	L57:
 		{
 		trasmax = freq / 30;
 		if (freq <= 800) {
@@ -531,6 +613,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 		}
 
 	case 6:	// LPDDR2
+//	L61:
 		{
 		trasmax	   = freq / 60;
 		mr3	   = dmr3;
@@ -569,7 +652,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 		}
 		else {
 			tcwl       =  3;
-			tcke	   =  6;
+			tcke	     =  6;
 			wr_latency =  2;
 			t_rdata_en =  5;
 			mr2        = 10;
@@ -586,7 +669,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 		tdinit1 = 500*freq / 1000 + 1;
 		tdinit2 =  11*freq + 1;
 		tdinit3 =   1*freq + 1;
-		tmrd	= 5;
+		tmrd	  = 5;
 		tmrw    = 5;
 		twr2rd  = tcwl + twtr + 5;
 		mr1	= 195;
@@ -595,6 +678,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 	}
 
 	default:
+//	L84:
 		twr2rd		= 8;	// 48(sp)
 		tcksrx		= 4;	// t1
 		tckesr		= 3;	// t4
@@ -606,7 +690,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 		tmrd		= 2;	// t5
 		tmrw		= 0;	// a1
 		tcwl		= 3;	// a5
-		tcl		= 3;	// a0
+		tcl		  = 3;	// a0
 		wr_latency	= 1;	// a7
 		t_rdata_en	= 1;	// a4
 		mr3		= 0;	// s0
@@ -619,6 +703,7 @@ void auto_set_timing_para(dram_para_t *para) // s5
 		tdinit0		= 0;	// 16(sp)
 		break;
 	}
+// L60:
 	if (trtp < tcl - trp + 2) {
 		trtp = tcl - trp + 2;
 	}
@@ -631,44 +716,44 @@ void auto_set_timing_para(dram_para_t *para) // s5
 	if ((para->dram_mr3 & 0xffff0000) == 0) para->dram_mr3 = mr3;
 
 	// Set mode registers
-	writel(0x3103030, para->dram_mr0);
-	writel(0x3103034, para->dram_mr1);
-	writel(0x3103038, para->dram_mr2);
-	writel(0x310303c, para->dram_mr3);
+	writel(DRAM_MR0, para->dram_mr0);
+	writel(DRAM_MR1, para->dram_mr1);
+	writel(DRAM_MR2, para->dram_mr2);
+	writel(DRAM_MR3, para->dram_mr3);
 	writel(0x310302c, (para->dram_odt_en >> 4) & 0x3); // ??
 
 	// Set dram timing DRAMTMG0 - DRAMTMG5
 	reg_val= (twtp<<24) | (tfaw<<16) | (trasmax<<8) | (tras<<0);
-	writel(0x3103058, reg_val);
+	writel(DRAMTMG0, reg_val);
 	reg_val= (txp<<16) | (trtp<<8) | (trc<<0);
-	writel(0x310305c, reg_val);
+	writel(DRAMTMG1, reg_val);
 	reg_val= (tcwl<<24) | (tcl<<16) | (trd2wr<<8) | (twr2rd<<0);
-	writel(0x3103060, reg_val);
+	writel(DRAMTMG2, reg_val);
 	reg_val= (tmrw<<16) | (tmrd<<12) | (tmod<<0);
-	writel(0x3103064, reg_val);
+	writel(DRAMTMG3, reg_val);
 	reg_val= (trcd<<24) | (tccd<<16) | (trrd<<8) | (trp<<0);
-	writel(0x3103068, reg_val);
+	writel(DRAMTMG4, reg_val);
 	reg_val= (tcksrx<<24) | (tcksrx<<16) | (tckesr<<8) | (tcke<<0);
-	writel(0x310306c, reg_val);
+	writel(DRAMTMG5, reg_val);
 
 	// Set two rank timing
-	reg_val  = readl(0x3103078);
+	reg_val  = readl(DRAMTMG8);
 	reg_val &= 0x0fff0000;
 	reg_val |= (para->dram_clk < 800) ? 0xf0006600 : 0xf0007600;
 	reg_val |= 0x10;
-	writel(0x3103078, reg_val);
+	writel(DRAMTMG8, reg_val);
 
 	// Set phy interface time PITMG0, PTR3, PTR4
 	reg_val = (0x2<<24) | (t_rdata_en<<16) | (0x1<<8) | (wr_latency<<0);
-	writel(0x3103080, reg_val);
-	writel(0x3103050, ((tdinit0<<0)|(tdinit1<<20)));
-	writel(0x3103054, ((tdinit2<<0)|(tdinit3<<20)));
+	writel(PITMG0, reg_val);
+	writel(PTR3, ((tdinit0<<0)|(tdinit1<<20)));
+	writel(PTR4, ((tdinit2<<0)|(tdinit3<<20)));
 
 	// Set refresh timing and mode
 	reg_val = (trefi<<16) | (trfc<<0);
-	writel(0x3103090, reg_val);
+	writel(RFSHTMG, reg_val);
 	reg_val = 0x0fff0000 & (trefi<<15);
-	writel(0x3103094, reg_val);
+	writel(RFSHCTL1, reg_val);
 }
 
 // Not used ?
@@ -796,7 +881,7 @@ void mctl_sys_init(dram_para_t *para)
 	sdelay(5);
 
 	// mCTL clock enable
-	writel(0x310300c, 0x00008000);
+	writel(MCTL_CLK_EN, 0x00008000);
 	sdelay(10);
 }
 
@@ -810,12 +895,12 @@ void mctl_com_init(dram_para_t *para)
 	int i;
 
 	// purpose ??
-	val = readl(0x3102008) & 0xffffc0ff;
+	val = readl(UNKNOWN1) & 0xffffc0ff;
 	val |= 0x2000;
-	writel(0x3102008, val);
+	witel(UNKNOWN1, val);
 
 	// Set sdram type and word width
-	val  = readl(0x3102000) & 0xff000fff;
+	val  = readl(MC_WORK_MODE_RANK0_LOW) & 0xff000fff;
 	val |= (para->dram_type &0x7) << 16;			// DRAM type
 	val |= (~para->dram_para2 & 0x1) << 12;			// DQ width
 	if((para->dram_type) != 6 && (para->dram_type) != 7) {
@@ -825,12 +910,12 @@ void mctl_com_init(dram_para_t *para)
 	else {
 		val |= 0x480000;	// type 6 and 7 must use 1T
 	}
-	writel(0x3102000, val);
+	writel(MC_WORK_MODE_RANK0_LOW, val);
 
 	// init rank / bank / row for single/dual or two different ranks
 	val = para->dram_para2;
 	end = ((val & 0x100) && (((val >> 12) & 0xf) != 1)) ? 32 : 16;
-	ptr = 0x3102000;
+	ptr = MC_WORK_MODE_RANK0_LOW;
 
 	for (i = 0 ; i != end; i += 16) {
 
@@ -853,7 +938,7 @@ void mctl_com_init(dram_para_t *para)
 	}
 
 	// set ODTMAP based on number of ranks in use
-	val = (readl(0x3102000) & 0x1) ? 0x303 : 0x201;
+	val = (readl(MC_WORK_MODE_RANK0_LOW) & 0x1) ? 0x303 : 0x201;
 	writel(0x3103120, val);
 
 	// set mctl reg 3c4 to zero when using half DQ
@@ -863,9 +948,9 @@ void mctl_com_init(dram_para_t *para)
 
 	// purpose ??
 	if (para->dram_tpr4) {
-		val  = readl(0x3102000);
+		val  = readl(MC_WORK_MODE_RANK0_LOW);
 		val |= (para->dram_tpr4 << 25) & 0x06000000;
-		writel(0x3102000, val);
+		writel(MC_WORK_MODE_RANK0_LOW, val);
 
 		val  = readl(0x3102004);
 		val |= ((para->dram_tpr4 >> 2) << 12) & 0x001ff000;
@@ -1193,7 +1278,8 @@ int DRAMC_get_dram_size(void)
 {
 	unsigned int rval, temp, size0, size1;
 
-	rval = readl(0x3102000);	// MC_WORK_MODE0
+  // MC_WORK_MODE0 (not MC_WORK_MODE, low word)
+	rval = readl(MC_WORK_MODE_RANK0_LOW);
 
 	temp  = (rval>>8) & 0xf;	// page size - 3
 	temp += (rval>>4) & 0xf;	// row width - 1
@@ -1206,7 +1292,8 @@ int DRAMC_get_dram_size(void)
 		return size0;
 	}
 
-	rval = readl(0x3102004);	// MC_WORK_MODE1
+  // MC_WORK_MODE1 (not MC_WORK_MODE, high word)
+	rval = readl(MC_WORK_MODE_RANK0_HIGH);
 
 	temp = rval & 0x3;
 	if (temp == 0) {		// two identical ranks
@@ -1232,10 +1319,10 @@ int dqs_gate_detect(dram_para_t *para)
 {
 	unsigned int rval, dx0, dx1;
 
-	if (readl(0x3103010) & (1 << 22)) {
+	if (readl(UNKNOWN3) & (1 << 22)) {
 
-		dx0 = (readl(0x3103348) >> 24) & 0x3;
-		dx1 = (readl(0x31033c8) >> 24) & 0x3;
+		dx0 = (readl(UNKNOWN4) >> 24) & 0x3;
+		dx1 = (readl(UNKNOWN5) >> 24) & 0x3;
 
 		if (dx0 == 2) {
 			rval  = para->dram_para2;
@@ -1252,14 +1339,14 @@ int dqs_gate_detect(dram_para_t *para)
 		}
 		else if (dx0 == 0) {
 			rval  = para->dram_para2;
-			rval &= 0xfffffff0;
-			rval |= 0x00001001;
+			rval &= 0xfffffff0; // l 7920
+			rval |= 0x00001001; // l 7918
 			para->dram_para2 = rval;
 			printf("[AUTO DEBUG] dual rank and half DQ!\n");
 			return 1;
 		}
 		else {
-			if (para->dram_tpr13 & (1 << 29)) {
+			if (para->dram_tpr13 & (1 << 29)) { // l 7935
 				printf("DX0 state:%d\n", dx0);
 				printf("DX1 state:%d\n", dx1);
 			}
@@ -1321,14 +1408,14 @@ void mctl_vrefzq_init(dram_para_t *para)
 	unsigned int val;
 
 	if ((para->dram_tpr13 & (1 << 17)) == 0) {
-		val  = readl(0x3103110) & 0x80808080;	// IOCVR0
+		val  = readl(IOCVR_LOW) & 0x80808080;	// IOCVR0
 		val |= para->dram_tpr5;
-		writel(0x3103110, val);
+		writel(IOCVR_LOW, val);
 
 		if ((para->dram_tpr13 & (1 << 16)) == 0) {
-			val  = readl(0x3103114) & 0xffffff80; // IOCVR1
+			val  = readl(IOCVR_HIGH) & 0xffffff80; // IOCVR1
 			val |= para->dram_tpr6 & 0x7f;
-			writel(0x3103114, val);
+			writel(IOCVR_HIGH, val);
 		}
 	}
 }
@@ -1338,7 +1425,7 @@ void mctl_vrefzq_init(dram_para_t *para)
 // establish the actual ram size. The third time is final one, with the final
 // settings.
 //
-int mctl_core_init(dram_para_t *para)
+int mctl_core_init(dram_para_t *para) // l8320
 {
 	mctl_sys_init(para);
 	mctl_vrefzq_init(para);
@@ -1370,7 +1457,7 @@ int auto_scan_dram_size(dram_para_t *para) // s7
 	}
 
 	maxrank = (para->dram_para2 & 0xf000) ? 2 : 1;
-	mc_work_mode = 0x3102000;
+	mc_work_mode = MC_WORK_MODE_RANK0_LOW;
 	offs = 0;
 
 	// write test pattern
@@ -1412,10 +1499,10 @@ int auto_scan_dram_size(dram_para_t *para) // s7
 
 		if (rank == 1) {
 			// Set bank mode for rank0
-			rval  = readl(0x3102000);
+			rval  = readl(MC_WORK_MODE_RANK0_LOW);
 			rval &= 0xfffff003;
 			rval |= 0x000006a4;
-			writel(0x3102000, rval);
+			writel(MC_WORK_MODE_RANK0_LOW, rval);
 		}
 
 		// Set bank mode for current rank
@@ -1448,10 +1535,10 @@ int auto_scan_dram_size(dram_para_t *para) // s7
 
 		if (rank == 1) {
 			// Set page mode for rank0
-			rval  = readl(0x3102000);
+			rval  = readl(MC_WORK_MODE_RANK0_LOW);
 			rval &= 0xfffff003;
 			rval |= 0x00000aa0;
-			writel(0x3102000, rval);
+			writel(MC_WORK_MODE_RANK0_LOW, rval);
 		}
 
 		// Set page mode for current rank
@@ -1489,15 +1576,15 @@ int auto_scan_dram_size(dram_para_t *para) // s7
 		rank++;
 		if (rank != maxrank) {
 			if (rank == 1) {
-				rval  = readl(0x3202000); // MC_WORK_MODE
+				rval  = readl(MC_WORK_MODE_RANK1_LOW); // MC_WORK_MODE
 				rval &= 0xfffff003;
 				rval |= 0x000006f0;
-				writel(0x3202000, rval);
+				writel(MC_WORK_MODE_RANK1_LOW, rval);
 
-				rval  = readl(0x3202004); // MC_WORK_MODE2
+				rval  = readl(MC_WORK_MODE_RANK1_HIGH); // MC_WORK_MODE2
 				rval &= 0xfffff003;
 				rval |= 0x000006f0;
-				writel(0x3202004, rval);
+				writel(MC_WORK_MODE_RANK1_HIGH, rval);
 			}
 			offs += 16; // store rank1 config in upper half of para1
 			mc_work_mode +=  4; // move to MC_WORK_MODE2
@@ -1536,7 +1623,7 @@ int auto_scan_dram_rank_width(dram_para_t *para)
 	para->dram_tpr13 = v;
 
 	mctl_core_init(para);
-	if (readl(0x3103010) & (1 << 20)) {
+	if (readl(UNKNOWN3) & (1 << 20)) {
 		return 0;
 	}
 	if (dqs_gate_detect(para) == 0) {
@@ -1548,6 +1635,7 @@ int auto_scan_dram_rank_width(dram_para_t *para)
 	return 1;
 }
 
+/* STEP 2 */
 // This routine determines the sdram topology. It first establishes the number
 // of ranks and the DQ width. Then it scans the sdram address lines to establish
 // the size of each rank. It then updates dram_tpr13 to reflect that the sizes
@@ -1573,27 +1661,28 @@ int auto_scan_dram_config(dram_para_t *para)
 	return 1;
 }
 
-
+/* MAIN */
 signed int init_DRAM(int type, dram_para_t *para) // s0
 {
 	int rc, mem_size;
 
+  // STEP 1: ZQ, gating, calibration and voltage
 	// Test ZQ status
 	if (para->dram_tpr13 & (1 << 16)) {
 		printf("DRAM only have internal ZQ!!\n");
-		writel(0x3000160, readl(0x3000160) |  0x100);
-		writel(0x3000168, 0);
+		writel(RES_CAL_CTRL_REG, readl(RES_CAL_CTRL_REG) | 0x100 );
+		writel(ZQ_INTERNAL, 0); // TODO: correct name?
 		sdelay(10);
 	}
 	else {
-		writel(0x7010254, 0);
-		writel(0x3000160, readl(0x3000160) & ~0x003);
+		writel(ANALOG_SYS_PWROFF_GATING_REG, 0); // 0x7010000 + 0x254; l 9655
+		writel(RES_CAL_CTRL_REG, readl(RES_CAL_CTRL_REG) & ~0x003);
 		sdelay(10);
-		writel(0x3000160, readl(0x3000160) & ~0x108);
+		writel(RES_CAL_CTRL_REG, readl(RES_CAL_CTRL_REG) & ~0x108);
 		sdelay(10);
-		writel(0x3000160, readl(0x3000160) |  0x001);
+		writel(RES_CAL_CTRL_REG, readl(RES_CAL_CTRL_REG) |  0x001);
 		sdelay(20);
-		printf("ZQ value = 0x%x***********\n", readl(0x3000172));
+		printf("ZQ value = 0x%x***********", readl(ZQ_VALUE));
 	}
 
 	// Set voltage
@@ -1607,6 +1696,7 @@ signed int init_DRAM(int type, dram_para_t *para) // s0
 		if (para->dram_type==3) set_ddr_voltage(1500);
 	}
 
+  // STEP 2: CONFIG
 	// Set SDRAM controller auto config
 	if ( (para->dram_tpr13 & 0x1)==0 ) {
 		if ( auto_scan_dram_config(para)==0 ) {
@@ -1651,7 +1741,7 @@ signed int init_DRAM(int type, dram_para_t *para) // s0
 		para->dram_para2 = (para->dram_para2 & 0xffffu) | rc << 16;
 	}
 	mem_size = rc;
-
+	// TODO: define constants
 	// Purpose ??
 	if ( para->dram_tpr13 & (1 << 30) ) {
 		rc = readl(&para->dram_tpr8);
@@ -1751,3 +1841,10 @@ unsigned int mctl_init(void)
 	ret_val = init_DRAM(0, &dram_para);
 	return ret_val;
 }
+/*
+void
+sdram_init(void)
+{
+	init_DRAM(0, &nezha_dram);
+}
+*/
