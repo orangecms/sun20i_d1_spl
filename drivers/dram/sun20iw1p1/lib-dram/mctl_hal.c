@@ -3,6 +3,7 @@
 #include <common.h>
 #include <arch/dram_v2.h>
 /*
+#include <asm/types.h>
 #include <asm/io.h>
 #include <arch/boot0.h>
 */
