@@ -111,7 +111,7 @@ PHONY += FORCE
 FORCE:
 .PHONY: $(PHONY)
 
-CFLAGS=-I$(SRCTREE)/include/ -I$(SRCTREE)/include/arch/riscv/ -I$(SRCTREE)/include/configs/ -I$(SRCTREE)/include/arch/sun20iw1p1/ -I$(SRCTREE)/include/openssl/
+#CFLAGS=-I$(SRCTREE)/include/ -I$(SRCTREE)/include/arch/riscv/ -I$(SRCTREE)/include/configs/ -I$(SRCTREE)/include/arch/sun20iw1p1/ -I$(SRCTREE)/include/openssl/
 dram:
 	echo $(CFLAGS)
 	riscv64-linux-gnu-gcc $(CFLAGS) drivers/dram/sun20iw1p1/lib-dram/mctl_hal.c

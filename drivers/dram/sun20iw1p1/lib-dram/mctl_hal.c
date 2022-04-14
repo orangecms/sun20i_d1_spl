@@ -74,7 +74,7 @@ void dram_udelay(unsigned int d1)
 #define VER_REG ((char*)SYS_CFG + 0x0024)
 #define EMAC_EPHY_CLK_REG0 ((char*)SYS_CFG + 0x0030)
 #define SYS_LDO_CTRL_REG ((char*)SYS_CFG + 0x0150)
-#define RES_CAL_CTRL_REG ((char*)SYS_CFG + 0x0160)
+//#define RES_CAL_CTRL_REG ((char*)SYS_CFG + 0x0160)
 #define RES240_CTRL_REG ((char*)SYS_CFG + 0x0168)
 #define RES_CAL_STATUS_REG ((char*)SYS_CFG + 0x016c)
 
@@ -892,13 +892,14 @@ void mctl_sys_init(dram_para_t *para)
 //
 void mctl_com_init(dram_para_t *para)
 {
-	unsigned int val, end, ptr;
+	unsigned int val, end;
+  char* ptr;
 	int i;
 
 	// purpose ??
 	val = readl(UNKNOWN1) & 0xffffc0ff;
 	val |= 0x2000;
-	witel(UNKNOWN1, val);
+	writel(UNKNOWN1, val);
 
 	// Set sdram type and word width
 	val  = readl(MC_WORK_MODE_RANK0_LOW) & 0xff000fff;
@@ -1449,7 +1450,8 @@ int mctl_core_init(dram_para_t *para) // l8320
 //
 int auto_scan_dram_size(dram_para_t *para) // s7
 {
-	unsigned int	rval, i, j, rank, maxrank, offs, mc_work_mode;
+	unsigned int	rval, i, j, rank, maxrank, offs;
+  char* mc_work_mode;
 	unsigned int	chk, ptr, shft, banks;
 
 	if (mctl_core_init(para) == 0) {
