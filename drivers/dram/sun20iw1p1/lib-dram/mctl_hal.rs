@@ -1,4 +1,12 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
+#![allow(
+    dead_code,
+    mutable_transmutes,
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    unused_assignments,
+    unused_mut
+)]
 #![register_tool(c2rust)]
 #![feature(asm, register_tool)]
 use std::arch::asm;
@@ -96,16 +104,16 @@ pub unsafe extern "C" fn dram_vol_set(mut para: *mut dram_para_t) {
     }
     vol = 25 as libc::c_int;
     reg = rv_readl(
-        (0x3000000 as libc::c_int as *mut libc::c_char)
-            .offset(0x150 as libc::c_int as isize) as intptr_t as *const libc::c_void,
+        (0x3000000 as libc::c_int as *mut libc::c_char).offset(0x150 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
     ) as libc::c_int;
     reg &= !(0xff00 as libc::c_int);
     reg |= vol << 8 as libc::c_int;
     reg &= !(0x200000 as libc::c_int);
     rv_writel(
         reg as u32_0,
-        (0x3000000 as libc::c_int as *mut libc::c_char)
-            .offset(0x150 as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+        (0x3000000 as libc::c_int as *mut libc::c_char).offset(0x150 as libc::c_int as isize)
+            as intptr_t as *mut libc::c_void,
     );
     sdelay(1 as libc::c_int as libc::c_ulong);
 }
@@ -157,105 +165,119 @@ pub unsafe extern "C" fn eye_delay_compensation(mut para: *mut dram_para_t) {
     ptr = 0x3103310 as libc::c_int as libc::c_uint;
     while ptr != 0x3103334 as libc::c_int as libc::c_uint {
         val = rv_readl(ptr as intptr_t as *const libc::c_void);
-        val
-            |= (*para).dram_tpr11 << 9 as libc::c_int
-                & 0x1e00 as libc::c_int as libc::c_uint;
-        val
-            |= (*para).dram_tpr12 << 1 as libc::c_int
-                & 0x1e as libc::c_int as libc::c_uint;
+        val |= (*para).dram_tpr11 << 9 as libc::c_int & 0x1e00 as libc::c_int as libc::c_uint;
+        val |= (*para).dram_tpr12 << 1 as libc::c_int & 0x1e as libc::c_int as libc::c_uint;
         rv_writel(val, ptr as intptr_t as *mut libc::c_void);
         ptr = ptr.wrapping_add(4 as libc::c_int as libc::c_uint);
     }
     ptr = 0x3103390 as libc::c_int as libc::c_uint;
     while ptr != 0x31033b4 as libc::c_int as libc::c_uint {
         val = rv_readl(ptr as intptr_t as *const libc::c_void);
-        val
-            |= ((*para).dram_tpr11 >> 4 as libc::c_int) << 9 as libc::c_int
-                & 0x1e00 as libc::c_int as libc::c_uint;
-        val
-            |= ((*para).dram_tpr12 >> 4 as libc::c_int) << 1 as libc::c_int
-                & 0x1e as libc::c_int as libc::c_uint;
+        val |= ((*para).dram_tpr11 >> 4 as libc::c_int) << 9 as libc::c_int
+            & 0x1e00 as libc::c_int as libc::c_uint;
+        val |= ((*para).dram_tpr12 >> 4 as libc::c_int) << 1 as libc::c_int
+            & 0x1e as libc::c_int as libc::c_uint;
         rv_writel(val, ptr as intptr_t as *mut libc::c_void);
         ptr = ptr.wrapping_add(4 as libc::c_int as libc::c_uint);
     }
     val = rv_readl(0x3103100 as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0xfbffffff as libc::c_uint;
-    rv_writel(val, 0x3103100 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103100 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103334 as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr11 >> 16 as libc::c_int) << 9 as libc::c_int
-            & 0x1e00 as libc::c_int as libc::c_uint;
-    val
-        |= ((*para).dram_tpr12 >> 16 as libc::c_int) << 1 as libc::c_int
-            & 0x1e as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103334 as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr11 >> 16 as libc::c_int) << 9 as libc::c_int
+        & 0x1e00 as libc::c_int as libc::c_uint;
+    val |= ((*para).dram_tpr12 >> 16 as libc::c_int) << 1 as libc::c_int
+        & 0x1e as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x3103334 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103338 as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr11 >> 16 as libc::c_int) << 9 as libc::c_int
-            & 0x1e00 as libc::c_int as libc::c_uint;
-    val
-        |= ((*para).dram_tpr12 >> 16 as libc::c_int) << 1 as libc::c_int
-            & 0x1e as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103338 as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr11 >> 16 as libc::c_int) << 9 as libc::c_int
+        & 0x1e00 as libc::c_int as libc::c_uint;
+    val |= ((*para).dram_tpr12 >> 16 as libc::c_int) << 1 as libc::c_int
+        & 0x1e as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x3103338 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x31033b4 as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr11 >> 20 as libc::c_int) << 9 as libc::c_int
-            & 0x1e00 as libc::c_int as libc::c_uint;
-    val
-        |= ((*para).dram_tpr12 >> 20 as libc::c_int) << 1 as libc::c_int
-            & 0x1e as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x31033b4 as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr11 >> 20 as libc::c_int) << 9 as libc::c_int
+        & 0x1e00 as libc::c_int as libc::c_uint;
+    val |= ((*para).dram_tpr12 >> 20 as libc::c_int) << 1 as libc::c_int
+        & 0x1e as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x31033b4 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x31033b8 as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr11 >> 20 as libc::c_int) << 9 as libc::c_int
-            & 0x1e00 as libc::c_int as libc::c_uint;
-    val
-        |= ((*para).dram_tpr12 >> 20 as libc::c_int) << 1 as libc::c_int
-            & 0x1e as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x31033b8 as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr11 >> 20 as libc::c_int) << 9 as libc::c_int
+        & 0x1e00 as libc::c_int as libc::c_uint;
+    val |= ((*para).dram_tpr12 >> 20 as libc::c_int) << 1 as libc::c_int
+        & 0x1e as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x31033b8 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x310333c as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr11 >> 16 as libc::c_int) << 25 as libc::c_int
-            & 0x1e000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x310333c as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr11 >> 16 as libc::c_int) << 25 as libc::c_int
+        & 0x1e000000 as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x310333c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x31033bc as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr11 >> 20 as libc::c_int) << 25 as libc::c_int
-            & 0x1e000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x31033bc as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr11 >> 20 as libc::c_int) << 25 as libc::c_int
+        & 0x1e000000 as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x31033bc as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103100 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x4000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103100 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103100 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(1 as libc::c_int as libc::c_ulong);
     ptr = 0x3103240 as libc::c_int as libc::c_uint;
     while ptr != 0x310327c as libc::c_int as libc::c_uint {
         val = rv_readl(ptr as intptr_t as *const libc::c_void);
-        val
-            |= ((*para).dram_tpr10 >> 4 as libc::c_int) << 8 as libc::c_int
-                & 0xf00 as libc::c_int as libc::c_uint;
+        val |= ((*para).dram_tpr10 >> 4 as libc::c_int) << 8 as libc::c_int
+            & 0xf00 as libc::c_int as libc::c_uint;
         rv_writel(val, ptr as intptr_t as *mut libc::c_void);
         ptr = ptr.wrapping_add(4 as libc::c_int as libc::c_uint);
     }
     ptr = 0x3103228 as libc::c_int as libc::c_uint;
     while ptr != 0x3103240 as libc::c_int as libc::c_uint {
         val = rv_readl(ptr as intptr_t as *const libc::c_void);
-        val
-            |= ((*para).dram_tpr10 >> 4 as libc::c_int) << 8 as libc::c_int
-                & 0xf00 as libc::c_int as libc::c_uint;
+        val |= ((*para).dram_tpr10 >> 4 as libc::c_int) << 8 as libc::c_int
+            & 0xf00 as libc::c_int as libc::c_uint;
         rv_writel(val, ptr as intptr_t as *mut libc::c_void);
         ptr = ptr.wrapping_add(4 as libc::c_int as libc::c_uint);
     }
     val = rv_readl(0x3103218 as libc::c_int as intptr_t as *const libc::c_void);
     val |= (*para).dram_tpr10 << 8 as libc::c_int & 0xf00 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103218 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103218 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x310321c as libc::c_int as intptr_t as *const libc::c_void);
     val |= (*para).dram_tpr10 << 8 as libc::c_int & 0xf00 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x310321c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x310321c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103280 as libc::c_int as intptr_t as *const libc::c_void);
-    val
-        |= ((*para).dram_tpr10 >> 12 as libc::c_int) << 8 as libc::c_int
-            & 0xf00 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103280 as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_tpr10 >> 12 as libc::c_int) << 8 as libc::c_int
+        & 0xf00 as libc::c_int as libc::c_uint;
+    rv_writel(
+        val,
+        0x3103280 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
 }
 #[no_mangle]
 pub unsafe extern "C" fn bit_delay_compensation() {
@@ -352,22 +374,24 @@ pub unsafe extern "C" fn bit_delay_compensation() {
         3 as libc::c_int as libc::c_uint,
     ];
     let mut start: *mut libc::c_uint = (0x3102000 as libc::c_int as *mut libc::c_char)
-        .offset(0x310 as libc::c_int as isize) as *mut libc::c_uint;
+        .offset(0x310 as libc::c_int as isize)
+        as *mut libc::c_uint;
     let mut end: *mut libc::c_uint = (0x3102000 as libc::c_int as *mut libc::c_char)
-        .offset(0x510 as libc::c_int as isize) as *mut libc::c_uint;
+        .offset(0x510 as libc::c_int as isize)
+        as *mut libc::c_uint;
     let mut datxiocr: *mut libc::c_uint = 0 as *mut libc::c_uint;
     let mut i: libc::c_uint = 0;
     let mut j: libc::c_uint = 0;
     let mut k: libc::c_uint = 0;
     let mut rval: libc::c_uint = 0;
     rval = rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x100 as libc::c_int as isize) as intptr_t as *const libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x100 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
     ) & 0x3ffffff as libc::c_int as libc::c_uint;
     rv_writel(
         rval,
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x100 as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x100 as libc::c_int as isize)
+            as intptr_t as *mut libc::c_void,
     );
     i = 0 as libc::c_int as libc::c_uint;
     datxiocr = start;
@@ -375,9 +399,7 @@ pub unsafe extern "C" fn bit_delay_compensation() {
         j = 0 as libc::c_int as libc::c_uint;
         k = i;
         while j != 11 as libc::c_int as libc::c_uint {
-            rval = rv_readl(
-                *datxiocr.offset(j as isize) as intptr_t as *const libc::c_void,
-            );
+            rval = rv_readl(*datxiocr.offset(j as isize) as intptr_t as *const libc::c_void);
             rval = rval.wrapping_add(data1[k as usize] << 8 as libc::c_int);
             rval = rval.wrapping_add(data0[k as usize]);
             rv_writel(
@@ -391,29 +413,27 @@ pub unsafe extern "C" fn bit_delay_compensation() {
         datxiocr = datxiocr.offset(0x20 as libc::c_int as isize);
     }
     rval = rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x100 as libc::c_int as isize) as intptr_t as *const libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x100 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
     ) | 0x4000000 as libc::c_int as libc::c_uint;
     rv_writel(
         rval,
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x100 as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x100 as libc::c_int as isize)
+            as intptr_t as *mut libc::c_void,
     );
 }
 #[no_mangle]
 pub unsafe extern "C" fn set_master_priority_pad(mut para: *mut dram_para_t) {
     let mut val: libc::c_uint = 0;
     val = rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0xc as libc::c_int as isize) as intptr_t as *const libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0xc as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
     ) & 0xfffff000 as libc::c_uint;
-    val
-        |= ((*para).dram_clk >> 1 as libc::c_int)
-            .wrapping_sub(1 as libc::c_int as libc::c_uint);
+    val |= ((*para).dram_clk >> 1 as libc::c_int).wrapping_sub(1 as libc::c_int as libc::c_uint);
     rv_writel(
         val,
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0xc as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0xc as libc::c_int as isize)
+            as intptr_t as *mut libc::c_void,
     );
     rv_writel(
         0x1000 as libc::c_int as u32_0,
@@ -521,43 +541,40 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
     type_0 = (*para).dram_type;
     tpr13 = (*para).dram_tpr13;
     if (*para).dram_tpr13 & 0x2 as libc::c_int as libc::c_uint != 0 {
-        tccd = ((*para).dram_tpr0 >> 21 as libc::c_int
-            & 0x7 as libc::c_int as libc::c_uint) as libc::c_uchar;
-        tfaw = ((*para).dram_tpr0 >> 15 as libc::c_int
-            & 0x3f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        trrd = ((*para).dram_tpr0 >> 11 as libc::c_int
-            & 0xf as libc::c_int as libc::c_uint) as libc::c_uchar;
-        trcd = ((*para).dram_tpr0 >> 6 as libc::c_int
-            & 0x1f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        trc = ((*para).dram_tpr0 >> 0 as libc::c_int
-            & 0x3f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        txp = ((*para).dram_tpr1 >> 23 as libc::c_int
-            & 0x1f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        twtr = ((*para).dram_tpr1 >> 20 as libc::c_int
-            & 0x7 as libc::c_int as libc::c_uint) as libc::c_uchar;
-        trtp = ((*para).dram_tpr1 >> 15 as libc::c_int
-            & 0x1f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        twr = ((*para).dram_tpr1 >> 11 as libc::c_int
-            & 0xf as libc::c_int as libc::c_uint) as libc::c_uchar;
-        trp = ((*para).dram_tpr1 >> 6 as libc::c_int
-            & 0x1f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        tras = ((*para).dram_tpr1 >> 0 as libc::c_int
-            & 0x3f as libc::c_int as libc::c_uint) as libc::c_uchar;
-        trfc = ((*para).dram_tpr2 >> 12 as libc::c_int
-            & 0x1ff as libc::c_int as libc::c_uint) as libc::c_ushort;
-        trefi = ((*para).dram_tpr2 >> 0 as libc::c_int
-            & 0xfff as libc::c_int as libc::c_uint) as libc::c_ushort;
+        tccd = ((*para).dram_tpr0 >> 21 as libc::c_int & 0x7 as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        tfaw = ((*para).dram_tpr0 >> 15 as libc::c_int & 0x3f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        trrd = ((*para).dram_tpr0 >> 11 as libc::c_int & 0xf as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        trcd = ((*para).dram_tpr0 >> 6 as libc::c_int & 0x1f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        trc = ((*para).dram_tpr0 >> 0 as libc::c_int & 0x3f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        txp = ((*para).dram_tpr1 >> 23 as libc::c_int & 0x1f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        twtr = ((*para).dram_tpr1 >> 20 as libc::c_int & 0x7 as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        trtp = ((*para).dram_tpr1 >> 15 as libc::c_int & 0x1f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        twr = ((*para).dram_tpr1 >> 11 as libc::c_int & 0xf as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        trp = ((*para).dram_tpr1 >> 6 as libc::c_int & 0x1f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        tras = ((*para).dram_tpr1 >> 0 as libc::c_int & 0x3f as libc::c_int as libc::c_uint)
+            as libc::c_uchar;
+        trfc = ((*para).dram_tpr2 >> 12 as libc::c_int & 0x1ff as libc::c_int as libc::c_uint)
+            as libc::c_ushort;
+        trefi = ((*para).dram_tpr2 >> 0 as libc::c_int & 0xfff as libc::c_int as libc::c_uint)
+            as libc::c_ushort;
     } else {
         let mut frq2: libc::c_uint = freq >> 1 as libc::c_int;
         if type_0 == 3 as libc::c_int as libc::c_uint {
-            trfc = auto_cal_timing(350 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_ushort;
-            trefi = (auto_cal_timing(7800 as libc::c_int as libc::c_uint, frq2)
-                / 32 as libc::c_int + 1 as libc::c_int) as libc::c_ushort;
-            twr = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trcd = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trfc = auto_cal_timing(350 as libc::c_int as libc::c_uint, frq2) as libc::c_ushort;
+            trefi = (auto_cal_timing(7800 as libc::c_int as libc::c_uint, frq2) / 32 as libc::c_int
+                + 1 as libc::c_int) as libc::c_ushort;
+            twr = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trcd = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             twtr = (twr as libc::c_int + 2 as libc::c_int) as libc::c_uchar;
             if (twr as libc::c_int) < 2 as libc::c_int {
                 twtr = 2 as libc::c_int as libc::c_uchar;
@@ -567,77 +584,55 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
                 twr = 2 as libc::c_int as libc::c_uchar;
             }
             if freq <= 800 as libc::c_int as libc::c_uint {
-                tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
-                trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
+                tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+                trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
                 if (trrd as libc::c_int) < 2 as libc::c_int {
                     trrd = 2 as libc::c_int as libc::c_uchar;
                 }
-                trc = auto_cal_timing(53 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
-                tras = auto_cal_timing(38 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
+                trc = auto_cal_timing(53 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+                tras = auto_cal_timing(38 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
                 txp = trrd;
                 trp = trcd;
             } else {
-                tfaw = auto_cal_timing(35 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
-                trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
+                tfaw = auto_cal_timing(35 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+                trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
                 if (trrd as libc::c_int) < 2 as libc::c_int {
                     trrd = 2 as libc::c_int as libc::c_uchar;
                 }
-                trcd = auto_cal_timing(14 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
-                trc = auto_cal_timing(48 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
-                tras = auto_cal_timing(34 as libc::c_int as libc::c_uint, frq2)
-                    as libc::c_uchar;
+                trcd = auto_cal_timing(14 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+                trc = auto_cal_timing(48 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+                tras = auto_cal_timing(34 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
                 txp = trrd;
                 trp = trcd;
             }
         } else if type_0 == 2 as libc::c_int as libc::c_uint {
-            tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trcd = auto_cal_timing(20 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trc = auto_cal_timing(65 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            twtr = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trp = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            tras = auto_cal_timing(45 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trefi = (auto_cal_timing(7800 as libc::c_int as libc::c_uint, frq2)
-                / 32 as libc::c_int) as libc::c_ushort;
-            trfc = auto_cal_timing(328 as libc::c_int as libc::c_uint, frq2)
+            tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trcd = auto_cal_timing(20 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trc = auto_cal_timing(65 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            twtr = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trp = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            tras = auto_cal_timing(45 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trefi = (auto_cal_timing(7800 as libc::c_int as libc::c_uint, frq2) / 32 as libc::c_int)
                 as libc::c_ushort;
+            trfc = auto_cal_timing(328 as libc::c_int as libc::c_uint, frq2) as libc::c_ushort;
             txp = 2 as libc::c_int as libc::c_uchar;
             twr = trp;
         } else if type_0 == 6 as libc::c_int as libc::c_uint {
-            tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (tfaw as libc::c_int) < 4 as libc::c_int {
                 tfaw = 4 as libc::c_int as libc::c_uchar;
             }
-            trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if trrd as libc::c_int == 0 as libc::c_int {
                 trrd = 1 as libc::c_int as libc::c_uchar;
             }
-            trcd = auto_cal_timing(24 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trcd = auto_cal_timing(24 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (trcd as libc::c_int) < 2 as libc::c_int {
                 trcd = 2 as libc::c_int as libc::c_uchar;
             }
-            trc = auto_cal_timing(70 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            txp = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trc = auto_cal_timing(70 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            txp = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if txp as libc::c_int == 0 as libc::c_int {
                 txp = 1 as libc::c_int as libc::c_uchar;
                 twtr = 2 as libc::c_int as libc::c_uchar;
@@ -648,55 +643,42 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
                     twtr = 2 as libc::c_int as libc::c_uchar;
                 }
             }
-            twr = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            twr = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (twr as libc::c_int) < 2 as libc::c_int {
                 twr = 2 as libc::c_int as libc::c_uchar;
             }
-            trp = auto_cal_timing(17 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            tras = auto_cal_timing(42 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trefi = (auto_cal_timing(3900 as libc::c_int as libc::c_uint, frq2)
-                / 32 as libc::c_int) as libc::c_ushort;
-            trfc = auto_cal_timing(210 as libc::c_int as libc::c_uint, frq2)
+            trp = auto_cal_timing(17 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            tras = auto_cal_timing(42 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trefi = (auto_cal_timing(3900 as libc::c_int as libc::c_uint, frq2) / 32 as libc::c_int)
                 as libc::c_ushort;
+            trfc = auto_cal_timing(210 as libc::c_int as libc::c_uint, frq2) as libc::c_ushort;
         } else if type_0 == 7 as libc::c_int as libc::c_uint {
-            tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            tfaw = auto_cal_timing(50 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (tfaw as libc::c_int) < 4 as libc::c_int {
                 tfaw = 4 as libc::c_int as libc::c_uchar;
             }
-            trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trrd = auto_cal_timing(10 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if trrd as libc::c_int == 0 as libc::c_int {
                 trrd = 1 as libc::c_int as libc::c_uchar;
             }
-            trcd = auto_cal_timing(24 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trcd = auto_cal_timing(24 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (trcd as libc::c_int) < 2 as libc::c_int {
                 trcd = 2 as libc::c_int as libc::c_uchar;
             }
-            trc = auto_cal_timing(70 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            twtr = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            trc = auto_cal_timing(70 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            twtr = auto_cal_timing(8 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (twtr as libc::c_int) < 2 as libc::c_int {
                 twtr = 2 as libc::c_int as libc::c_uchar;
             }
-            twr = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
+            twr = auto_cal_timing(15 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
             if (twr as libc::c_int) < 2 as libc::c_int {
                 twr = 2 as libc::c_int as libc::c_uchar;
             }
-            trp = auto_cal_timing(17 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            tras = auto_cal_timing(42 as libc::c_int as libc::c_uint, frq2)
-                as libc::c_uchar;
-            trefi = (auto_cal_timing(3900 as libc::c_int as libc::c_uint, frq2)
-                / 32 as libc::c_int) as libc::c_ushort;
-            trfc = auto_cal_timing(210 as libc::c_int as libc::c_uint, frq2)
+            trp = auto_cal_timing(17 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            tras = auto_cal_timing(42 as libc::c_int as libc::c_uint, frq2) as libc::c_uchar;
+            trefi = (auto_cal_timing(3900 as libc::c_int as libc::c_uint, frq2) / 32 as libc::c_int)
                 as libc::c_ushort;
+            trfc = auto_cal_timing(210 as libc::c_int as libc::c_uint, frq2) as libc::c_ushort;
             txp = twtr;
         } else {
             trfc = 128 as libc::c_int as libc::c_ushort;
@@ -713,22 +695,22 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
         }
         tccd = 2 as libc::c_int as libc::c_uchar;
         trtp = 4 as libc::c_int as libc::c_uchar;
-        (*para)
-            .dram_tpr0 = ((trc as libc::c_int) << 0 as libc::c_int
+        (*para).dram_tpr0 = ((trc as libc::c_int) << 0 as libc::c_int
             | (trcd as libc::c_int) << 6 as libc::c_int
             | (trrd as libc::c_int) << 11 as libc::c_int
             | (tfaw as libc::c_int) << 15 as libc::c_int
-            | (tccd as libc::c_int) << 21 as libc::c_int) as libc::c_uint;
-        (*para)
-            .dram_tpr1 = ((tras as libc::c_int) << 0 as libc::c_int
+            | (tccd as libc::c_int) << 21 as libc::c_int)
+            as libc::c_uint;
+        (*para).dram_tpr1 = ((tras as libc::c_int) << 0 as libc::c_int
             | (trp as libc::c_int) << 6 as libc::c_int
             | (twr as libc::c_int) << 11 as libc::c_int
             | (trtp as libc::c_int) << 15 as libc::c_int
             | (twtr as libc::c_int) << 20 as libc::c_int
-            | (txp as libc::c_int) << 23 as libc::c_int) as libc::c_uint;
-        (*para)
-            .dram_tpr2 = ((trefi as libc::c_int) << 0 as libc::c_int
-            | (trfc as libc::c_int) << 12 as libc::c_int) as libc::c_uint;
+            | (txp as libc::c_int) << 23 as libc::c_int)
+            as libc::c_uint;
+        (*para).dram_tpr2 = ((trefi as libc::c_int) << 0 as libc::c_int
+            | (trfc as libc::c_int) << 12 as libc::c_int)
+            as libc::c_uint;
     }
     let mut tcksrx: libc::c_uint = 0;
     let mut tckesr: libc::c_uint = 0;
@@ -965,20 +947,16 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
             .wrapping_add(2 as libc::c_int as libc::c_uint) as libc::c_uchar;
     }
     trtp = 4 as libc::c_int as libc::c_uchar;
-    if (*para).dram_mr0 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint
-    {
+    if (*para).dram_mr0 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         (*para).dram_mr0 = mr0;
     }
-    if (*para).dram_mr1 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint
-    {
+    if (*para).dram_mr1 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         (*para).dram_mr1 = mr1;
     }
-    if (*para).dram_mr2 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint
-    {
+    if (*para).dram_mr2 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         (*para).dram_mr2 = mr2;
     }
-    if (*para).dram_mr3 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint
-    {
+    if (*para).dram_mr3 & 0xffff0000 as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         (*para).dram_mr3 = mr3;
     }
     rv_writel(
@@ -1016,14 +994,15 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
         reg_val,
         0x310305c as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
     );
-    reg_val = tcwl << 24 as libc::c_int | tcl << 16 as libc::c_int
-        | trd2wr << 8 as libc::c_int | twr2rd << 0 as libc::c_int;
+    reg_val = tcwl << 24 as libc::c_int
+        | tcl << 16 as libc::c_int
+        | trd2wr << 8 as libc::c_int
+        | twr2rd << 0 as libc::c_int;
     rv_writel(
         reg_val,
         0x3103060 as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
     );
-    reg_val = tmrw << 16 as libc::c_int | tmrd << 12 as libc::c_int
-        | tmod << 0 as libc::c_int;
+    reg_val = tmrw << 16 as libc::c_int | tmrd << 12 as libc::c_int | tmod << 0 as libc::c_int;
     rv_writel(
         reg_val,
         0x3103064 as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
@@ -1036,22 +1015,22 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
         reg_val,
         0x3103068 as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
     );
-    reg_val = tcksrx << 24 as libc::c_int | tcksrx << 16 as libc::c_int
-        | tckesr << 8 as libc::c_int | tcke << 0 as libc::c_int;
+    reg_val = tcksrx << 24 as libc::c_int
+        | tcksrx << 16 as libc::c_int
+        | tckesr << 8 as libc::c_int
+        | tcke << 0 as libc::c_int;
     rv_writel(
         reg_val,
         0x310306c as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
     );
-    reg_val = rv_readl(
-        0x3103078 as libc::c_int as *mut libc::c_void as intptr_t as *const libc::c_void,
-    );
+    reg_val =
+        rv_readl(0x3103078 as libc::c_int as *mut libc::c_void as intptr_t as *const libc::c_void);
     reg_val &= 0xfff0000 as libc::c_int as libc::c_uint;
-    reg_val
-        |= if (*para).dram_clk < 800 as libc::c_int as libc::c_uint {
-            0xf0006600 as libc::c_uint
-        } else {
-            0xf0007600 as libc::c_uint
-        };
+    reg_val |= if (*para).dram_clk < 800 as libc::c_int as libc::c_uint {
+        0xf0006600 as libc::c_uint
+    } else {
+        0xf0007600 as libc::c_uint
+    };
     reg_val |= 0x10 as libc::c_int as libc::c_uint;
     rv_writel(
         reg_val,
@@ -1079,8 +1058,8 @@ pub unsafe extern "C" fn auto_set_timing_para(mut para: *mut dram_para_t) {
         reg_val,
         0x3103090 as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
     );
-    reg_val = (0xfff0000 as libc::c_int & (trefi as libc::c_int) << 15 as libc::c_int)
-        as libc::c_uint;
+    reg_val =
+        (0xfff0000 as libc::c_int & (trefi as libc::c_int) << 15 as libc::c_int) as libc::c_uint;
     rv_writel(
         reg_val,
         0x3103094 as libc::c_int as *mut libc::c_void as intptr_t as *mut libc::c_void,
@@ -1098,9 +1077,7 @@ pub unsafe extern "C" fn ccm_set_pll_ddr_clk(
     let mut val: libc::c_uint = 0;
     let mut clk: libc::c_uint = 0;
     let mut n: libc::c_uint = 0;
-    clk = if (*para).dram_tpr13
-        & ((1 as libc::c_int) << 6 as libc::c_int) as libc::c_uint != 0
-    {
+    clk = if (*para).dram_tpr13 & ((1 as libc::c_int) << 6 as libc::c_int) as libc::c_uint != 0 {
         (*para).dram_tpr9
     } else {
         (*para).dram_clk
@@ -1112,23 +1089,39 @@ pub unsafe extern "C" fn ccm_set_pll_ddr_clk(
     val &= 0xfff800fc as libc::c_uint;
     val |= n.wrapping_sub(1 as libc::c_int as libc::c_uint) << 8 as libc::c_int;
     val |= 0xc0000000 as libc::c_uint;
-    rv_writel(val, 0x2001010 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001010 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val &= 0xdfffffff as libc::c_uint;
     val |= 0xc0000000 as libc::c_uint;
-    rv_writel(val, 0x2001010 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001010 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val |= 0xe0000000 as libc::c_uint;
-    rv_writel(val, 0x2001010 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001010 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     while rv_readl(0x2001010 as libc::c_int as intptr_t as *const libc::c_void)
-        & 0x10000000 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
+        & 0x10000000 as libc::c_int as libc::c_uint
+        == 0 as libc::c_int as libc::c_uint
     {}
     sdelay(20 as libc::c_int as libc::c_ulong);
     val = rv_readl(0x2001000 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x8000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x2001000 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001000 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x2001800 as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0xfcfffcfc as libc::c_uint;
     val |= 0x80000000 as libc::c_uint;
-    rv_writel(val, 0x2001800 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     return n.wrapping_mul(24 as libc::c_int as libc::c_uint) as libc::c_int;
 }
 #[no_mangle]
@@ -1136,21 +1129,36 @@ pub unsafe extern "C" fn mctl_sys_init(mut para: *mut dram_para_t) {
     let mut val: libc::c_uint = 0;
     val = rv_readl(0x2001540 as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0xbfffffff as libc::c_uint;
-    rv_writel(val, 0x2001540 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001540 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x200180c as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0xfffffffe as libc::c_uint;
-    rv_writel(val, 0x200180c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x200180c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val &= 0xfffefffe as libc::c_uint;
-    rv_writel(val, 0x200180c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x200180c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x2001800 as libc::c_int as intptr_t as *const libc::c_void);
     rv_writel(
         val & 0xbfffffff as libc::c_uint,
         0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
     );
     val &= 0x7fffffff as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x2001800 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val |= 0x8000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x2001800 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(10 as libc::c_int as libc::c_ulong);
     val = ccm_set_pll_ddr_clk(0 as libc::c_int, para) as libc::c_uint;
     (*para).dram_clk = val >> 1 as libc::c_int;
@@ -1158,27 +1166,45 @@ pub unsafe extern "C" fn mctl_sys_init(mut para: *mut dram_para_t) {
     dram_disable_all_master();
     val = rv_readl(0x200180c as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x10000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x200180c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x200180c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x2001540 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x40000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x2001540 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001540 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x2001800 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x40000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x2001800 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(5 as libc::c_int as libc::c_ulong);
     val = rv_readl(0x200180c as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x1 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x200180c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x200180c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x2001800 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x80000000 as libc::c_uint;
-    rv_writel(val, 0x2001800 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val |= 0x88000000 as libc::c_uint;
-    rv_writel(val, 0x2001800 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x2001800 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(5 as libc::c_int as libc::c_ulong);
     rv_writel(
         0x8000 as libc::c_int as u32_0,
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x100c as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x100c as libc::c_int as isize)
+            as intptr_t as *mut libc::c_void,
     );
     sdelay(10 as libc::c_int as libc::c_ulong);
 }
@@ -1189,28 +1215,25 @@ pub unsafe extern "C" fn mctl_com_init(mut para: *mut dram_para_t) {
     let mut ptr: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut i: libc::c_int = 0;
     val = rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x8 as libc::c_int as isize) as intptr_t as *const libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x8 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
     ) & 0xffffc0ff as libc::c_uint;
     val |= 0x2000 as libc::c_int as libc::c_uint;
     rv_writel(
         val,
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x8 as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x8 as libc::c_int as isize)
+            as intptr_t as *mut libc::c_void,
     );
-    val = rv_readl(
-        0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void,
-    ) & 0xff000fff as libc::c_uint;
+    val =
+        rv_readl(0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void)
+            & 0xff000fff as libc::c_uint;
     val |= ((*para).dram_type & 0x7 as libc::c_int as libc::c_uint) << 16 as libc::c_int;
-    val
-        |= (!(*para).dram_para2 & 0x1 as libc::c_int as libc::c_uint)
-            << 12 as libc::c_int;
+    val |= (!(*para).dram_para2 & 0x1 as libc::c_int as libc::c_uint) << 12 as libc::c_int;
     if (*para).dram_type != 6 as libc::c_int as libc::c_uint
         && (*para).dram_type != 7 as libc::c_int as libc::c_uint
     {
-        val
-            |= ((*para).dram_tpr13 >> 5 as libc::c_int
-                & 0x1 as libc::c_int as libc::c_uint) << 19 as libc::c_int;
+        val |= ((*para).dram_tpr13 >> 5 as libc::c_int & 0x1 as libc::c_int as libc::c_uint)
+            << 19 as libc::c_int;
         val |= 0x400000 as libc::c_int as libc::c_uint;
     } else {
         val |= 0x480000 as libc::c_int as libc::c_uint;
@@ -1231,18 +1254,14 @@ pub unsafe extern "C" fn mctl_com_init(mut para: *mut dram_para_t) {
     ptr = 0x3102000 as libc::c_int as *mut libc::c_char;
     i = 0 as libc::c_int;
     while i as libc::c_uint != end {
-        val = rv_readl(ptr as intptr_t as *const libc::c_void)
-            & 0xfffff000 as libc::c_uint;
-        val
-            |= (*para).dram_para2 >> 12 as libc::c_int
-                & 0x3 as libc::c_int as libc::c_uint;
-        val
-            |= ((*para).dram_para1 >> i + 12 as libc::c_int) << 2 as libc::c_int
-                & 0x4 as libc::c_int as libc::c_uint;
-        val
-            |= ((*para).dram_para1 >> i + 4 as libc::c_int)
-                .wrapping_sub(1 as libc::c_int as libc::c_uint) << 4 as libc::c_int
-                & 0xff as libc::c_int as libc::c_uint;
+        val = rv_readl(ptr as intptr_t as *const libc::c_void) & 0xfffff000 as libc::c_uint;
+        val |= (*para).dram_para2 >> 12 as libc::c_int & 0x3 as libc::c_int as libc::c_uint;
+        val |= ((*para).dram_para1 >> i + 12 as libc::c_int) << 2 as libc::c_int
+            & 0x4 as libc::c_int as libc::c_uint;
+        val |= ((*para).dram_para1 >> i + 4 as libc::c_int)
+            .wrapping_sub(1 as libc::c_int as libc::c_uint)
+            << 4 as libc::c_int
+            & 0xff as libc::c_int as libc::c_uint;
         match (*para).dram_para1 >> i & 0xf as libc::c_int as libc::c_uint {
             8 => {
                 val |= 0xa00 as libc::c_int as libc::c_uint;
@@ -1266,15 +1285,18 @@ pub unsafe extern "C" fn mctl_com_init(mut para: *mut dram_para_t) {
     }
     val = (if rv_readl(
         0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void,
-    ) & 0x1 as libc::c_int as libc::c_uint != 0
+    ) & 0x1 as libc::c_int as libc::c_uint
+        != 0
     {
         0x303 as libc::c_int
     } else {
         0x201 as libc::c_int
     }) as libc::c_uint;
-    rv_writel(val, 0x3103120 as libc::c_int as intptr_t as *mut libc::c_void);
-    if (*para).dram_para2 & ((1 as libc::c_int) << 0 as libc::c_int) as libc::c_uint != 0
-    {
+    rv_writel(
+        val,
+        0x3103120 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
+    if (*para).dram_para2 & ((1 as libc::c_int) << 0 as libc::c_int) as libc::c_uint != 0 {
         rv_writel(
             0 as libc::c_int as u32_0,
             0x31033c4 as libc::c_int as intptr_t as *mut libc::c_void,
@@ -1282,22 +1304,20 @@ pub unsafe extern "C" fn mctl_com_init(mut para: *mut dram_para_t) {
     }
     if (*para).dram_tpr4 != 0 {
         val = rv_readl(
-            0x3102000 as libc::c_int as *mut libc::c_char as intptr_t
-                as *const libc::c_void,
+            0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void,
         );
-        val
-            |= (*para).dram_tpr4 << 25 as libc::c_int
-                & 0x6000000 as libc::c_int as libc::c_uint;
+        val |= (*para).dram_tpr4 << 25 as libc::c_int & 0x6000000 as libc::c_int as libc::c_uint;
         rv_writel(
             val,
-            0x3102000 as libc::c_int as *mut libc::c_char as intptr_t
-                as *mut libc::c_void,
+            0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *mut libc::c_void,
         );
         val = rv_readl(0x3102004 as libc::c_int as intptr_t as *const libc::c_void);
-        val
-            |= ((*para).dram_tpr4 >> 2 as libc::c_int) << 12 as libc::c_int
-                & 0x1ff000 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x3102004 as libc::c_int as intptr_t as *mut libc::c_void);
+        val |= ((*para).dram_tpr4 >> 2 as libc::c_int) << 12 as libc::c_int
+            & 0x1ff000 as libc::c_int as libc::c_uint;
+        rv_writel(
+            val,
+            0x3102004 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     }
 }
 #[no_mangle]
@@ -1497,10 +1517,13 @@ pub unsafe extern "C" fn mctl_phy_ac_remapping(mut para: *mut dram_para_t) {
     let mut fuse: libc::c_uint = 0;
     let mut val: libc::c_uint = 0;
     fuse = rv_readl(0x3002228 as libc::c_int as intptr_t as *const libc::c_void)
-        >> 8 as libc::c_int & 0x4 as libc::c_int as libc::c_uint;
-    printf(b"ddr_efuse_type: 0x%x\n\0" as *const u8 as *const libc::c_char, fuse);
-    if (*para).dram_tpr13 >> 18 as libc::c_int & 0x3 as libc::c_int as libc::c_uint != 0
-    {
+        >> 8 as libc::c_int
+        & 0x4 as libc::c_int as libc::c_uint;
+    printf(
+        b"ddr_efuse_type: 0x%x\n\0" as *const u8 as *const libc::c_char,
+        fuse,
+    );
+    if (*para).dram_tpr13 >> 18 as libc::c_int & 0x3 as libc::c_int as libc::c_uint != 0 {
         memcpy_self(cfg0.as_mut_ptr(), cfg7.as_mut_ptr(), 22 as libc::c_int);
     } else {
         match fuse {
@@ -1537,34 +1560,49 @@ pub unsafe extern "C" fn mctl_phy_ac_remapping(mut para: *mut dram_para_t) {
             | (cfg0[1 as libc::c_int as usize] as libc::c_int) << 10 as libc::c_int
             | (cfg0[0 as libc::c_int as usize] as libc::c_int) << 5 as libc::c_int)
             as libc::c_uint;
-        rv_writel(val, 0x3102500 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3102500 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = ((cfg0[10 as libc::c_int as usize] as libc::c_int) << 25 as libc::c_int
             | (cfg0[9 as libc::c_int as usize] as libc::c_int) << 20 as libc::c_int
             | (cfg0[8 as libc::c_int as usize] as libc::c_int) << 15 as libc::c_int
             | (cfg0[7 as libc::c_int as usize] as libc::c_int) << 10 as libc::c_int
             | (cfg0[6 as libc::c_int as usize] as libc::c_int) << 5 as libc::c_int
             | cfg0[5 as libc::c_int as usize] as libc::c_int) as libc::c_uint;
-        rv_writel(val, 0x3102504 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3102504 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = ((cfg0[15 as libc::c_int as usize] as libc::c_int) << 20 as libc::c_int
             | (cfg0[14 as libc::c_int as usize] as libc::c_int) << 15 as libc::c_int
             | (cfg0[13 as libc::c_int as usize] as libc::c_int) << 10 as libc::c_int
             | (cfg0[12 as libc::c_int as usize] as libc::c_int) << 5 as libc::c_int
             | cfg0[11 as libc::c_int as usize] as libc::c_int) as libc::c_uint;
-        rv_writel(val, 0x3102508 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3102508 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = ((cfg0[21 as libc::c_int as usize] as libc::c_int) << 25 as libc::c_int
             | (cfg0[20 as libc::c_int as usize] as libc::c_int) << 20 as libc::c_int
             | (cfg0[19 as libc::c_int as usize] as libc::c_int) << 15 as libc::c_int
             | (cfg0[18 as libc::c_int as usize] as libc::c_int) << 10 as libc::c_int
             | (cfg0[17 as libc::c_int as usize] as libc::c_int) << 5 as libc::c_int
             | cfg0[16 as libc::c_int as usize] as libc::c_int) as libc::c_uint;
-        rv_writel(val, 0x310250c as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x310250c as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = ((cfg0[4 as libc::c_int as usize] as libc::c_int) << 25 as libc::c_int
             | (cfg0[3 as libc::c_int as usize] as libc::c_int) << 20 as libc::c_int
             | (cfg0[2 as libc::c_int as usize] as libc::c_int) << 15 as libc::c_int
             | (cfg0[1 as libc::c_int as usize] as libc::c_int) << 10 as libc::c_int
             | (cfg0[0 as libc::c_int as usize] as libc::c_int) << 5 as libc::c_int
             | 1 as libc::c_int) as libc::c_uint;
-        rv_writel(val, 0x3102500 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3102500 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     }
 }
 #[no_mangle]
@@ -1574,76 +1612,103 @@ pub unsafe extern "C" fn mctl_channel_init(
 ) -> libc::c_uint {
     let mut val: libc::c_uint = 0;
     let mut dqs_gating_mode: libc::c_uint = 0;
-    dqs_gating_mode = (*para).dram_tpr13 >> 2 as libc::c_int
-        & 0x3 as libc::c_int as libc::c_uint;
+    dqs_gating_mode = (*para).dram_tpr13 >> 2 as libc::c_int & 0x3 as libc::c_int as libc::c_uint;
     val = rv_readl(0x310200c as libc::c_int as intptr_t as *const libc::c_void)
         & 0xfffff000 as libc::c_uint;
-    val
-        |= ((*para).dram_clk >> 1 as libc::c_int)
-            .wrapping_sub(1 as libc::c_int as libc::c_uint);
-    rv_writel(val, 0x310200c as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= ((*para).dram_clk >> 1 as libc::c_int).wrapping_sub(1 as libc::c_int as libc::c_uint);
+    rv_writel(
+        val,
+        0x310200c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103108 as libc::c_int as intptr_t as *const libc::c_void)
         & 0xfffff0ff as libc::c_uint;
     val |= 0x300 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103344 as libc::c_int as intptr_t as *const libc::c_void)
         & 0xffffffcf as libc::c_uint;
-    val
-        |= !(*para).dram_odt_en << 5 as libc::c_int
-            & 0x20 as libc::c_int as libc::c_uint;
+    val |= !(*para).dram_odt_en << 5 as libc::c_int & 0x20 as libc::c_int as libc::c_uint;
     if (*para).dram_clk > 672 as libc::c_int as libc::c_uint {
         val &= 0xffff09f1 as libc::c_uint;
         val |= 0x400 as libc::c_int as libc::c_uint;
     } else {
         val &= 0xffff0ff1 as libc::c_uint;
     }
-    rv_writel(val, 0x3103344 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103344 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x31033c4 as libc::c_int as intptr_t as *const libc::c_void)
         & 0xffffffcf as libc::c_uint;
-    val
-        |= !(*para).dram_odt_en << 5 as libc::c_int
-            & 0x20 as libc::c_int as libc::c_uint;
+    val |= !(*para).dram_odt_en << 5 as libc::c_int & 0x20 as libc::c_int as libc::c_uint;
     if (*para).dram_clk > 672 as libc::c_int as libc::c_uint {
         val &= 0xffff09f1 as libc::c_uint;
         val |= 0x400 as libc::c_int as libc::c_uint;
     } else {
         val &= 0xffff0ff1 as libc::c_uint;
     }
-    rv_writel(val, 0x31033c4 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x31033c4 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val = rv_readl(0x3103208 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x2 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103208 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103208 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     eye_delay_compensation(para);
     val = rv_readl(0x3103108 as libc::c_int as intptr_t as *const libc::c_void);
     if dqs_gating_mode == 1 as libc::c_int as libc::c_uint {
         val &= !(0xc0 as libc::c_int) as libc::c_uint;
-        rv_writel(val, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = rv_readl(0x31030bc as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xfffffef8 as libc::c_uint;
-        rv_writel(val, 0x31030bc as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x31030bc as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     } else if dqs_gating_mode == 2 as libc::c_int as libc::c_uint {
         val &= !(0xc0 as libc::c_int) as libc::c_uint;
         val |= 0x80 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = rv_readl(0x31030bc as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xfffffef8 as libc::c_uint;
-        val
-            |= ((*para).dram_tpr13 >> 16 as libc::c_int
-                & 0x1f as libc::c_int as libc::c_uint)
-                .wrapping_sub(2 as libc::c_int as libc::c_uint);
+        val |= ((*para).dram_tpr13 >> 16 as libc::c_int & 0x1f as libc::c_int as libc::c_uint)
+            .wrapping_sub(2 as libc::c_int as libc::c_uint);
         val |= 0x100 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x31030bc as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x31030bc as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         val = rv_readl(0x310311c as libc::c_int as intptr_t as *const libc::c_void)
             & 0x7fffffff as libc::c_int as libc::c_uint;
         val |= 0x8000000 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x310311c as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x310311c as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     } else {
         val &= !(0x40 as libc::c_int) as libc::c_uint;
-        rv_writel(val, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         sdelay(10 as libc::c_int as libc::c_ulong);
         val = rv_readl(0x3103108 as libc::c_int as intptr_t as *const libc::c_void);
         val |= 0xc0 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     }
     if (*para).dram_type == 6 as libc::c_int as libc::c_uint
         || (*para).dram_type == 7 as libc::c_int as libc::c_uint
@@ -1656,32 +1721,42 @@ pub unsafe extern "C" fn mctl_channel_init(
             val &= 0x88ffffff as libc::c_uint;
             val |= 0x22000000 as libc::c_int as libc::c_uint;
         }
-        rv_writel(val, 0x310311c as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x310311c as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     }
     val = rv_readl(0x31030c0 as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0xf0000000 as libc::c_uint;
-    val
-        |= (if (*para).dram_para2
-            & ((1 as libc::c_int) << 12 as libc::c_int) as libc::c_uint != 0
-        {
-            0x3000001 as libc::c_int
-        } else {
-            0x1000007 as libc::c_int
-        }) as libc::c_uint;
-    rv_writel(val, 0x31030c0 as libc::c_int as intptr_t as *mut libc::c_void);
+    val |= (if (*para).dram_para2 & ((1 as libc::c_int) << 12 as libc::c_int) as libc::c_uint != 0 {
+        0x3000001 as libc::c_int
+    } else {
+        0x1000007 as libc::c_int
+    }) as libc::c_uint;
+    rv_writel(
+        val,
+        0x31030c0 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     if rv_readl(0x70005d4 as libc::c_int as intptr_t as *const libc::c_void)
-        & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint != 0
+        & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
+        != 0
     {
         val = rv_readl(0x7010250 as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xfffffffd as libc::c_uint;
-        rv_writel(val, 0x7010250 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x7010250 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         sdelay(10 as libc::c_int as libc::c_ulong);
     }
     val = rv_readl(0x3103140 as libc::c_int as intptr_t as *const libc::c_void)
         & 0xfc000000 as libc::c_uint;
     val |= (*para).dram_zq & 0xffffff as libc::c_int as libc::c_uint;
     val |= 0x2000000 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103140 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103140 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     if dqs_gating_mode == 1 as libc::c_int as libc::c_uint {
         rv_writel(
             0x52 as libc::c_int as u32_0,
@@ -1692,7 +1767,8 @@ pub unsafe extern "C" fn mctl_channel_init(
             0x3103000 as libc::c_int as intptr_t as *mut libc::c_void,
         );
         while rv_readl(0x3103010 as libc::c_int as intptr_t as *const libc::c_void)
-            & 0x1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
+            & 0x1 as libc::c_int as libc::c_uint
+            == 0 as libc::c_int as libc::c_uint
         {}
         sdelay(10 as libc::c_int as libc::c_ulong);
         val = (if (*para).dram_type == 3 as libc::c_int as libc::c_uint {
@@ -1701,9 +1777,9 @@ pub unsafe extern "C" fn mctl_channel_init(
             0x520 as libc::c_int
         }) as libc::c_uint;
     } else if rv_readl(0x70005d4 as libc::c_int as intptr_t as *const libc::c_void)
-            & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
-            == 0 as libc::c_int as libc::c_uint
-        {
+        & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
+        == 0 as libc::c_int as libc::c_uint
+    {
         val = (if (*para).dram_type == 3 as libc::c_int as libc::c_uint {
             0x1f2 as libc::c_int
         } else {
@@ -1712,53 +1788,82 @@ pub unsafe extern "C" fn mctl_channel_init(
     } else {
         val = 0x62 as libc::c_int as libc::c_uint;
     }
-    rv_writel(val, 0x3103000 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103000 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     val |= 1 as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x3103000 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3103000 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(10 as libc::c_int as libc::c_ulong);
     while rv_readl(0x3103010 as libc::c_int as intptr_t as *const libc::c_void)
-        & 0x1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
+        & 0x1 as libc::c_int as libc::c_uint
+        == 0 as libc::c_int as libc::c_uint
     {}
     if rv_readl(0x70005d4 as libc::c_int as intptr_t as *const libc::c_void)
-        & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint != 0
+        & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
+        != 0
     {
         val = rv_readl(0x310310c as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xf9ffffff as libc::c_uint;
         val |= 0x4000000 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x310310c as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x310310c as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         sdelay(10 as libc::c_int as libc::c_ulong);
         val = rv_readl(0x3103004 as libc::c_int as intptr_t as *const libc::c_void);
         val |= 0x1 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x3103004 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3103004 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         while rv_readl(0x3103018 as libc::c_int as intptr_t as *const libc::c_void)
-            & 0x7 as libc::c_int as libc::c_uint != 0x3 as libc::c_int as libc::c_uint
+            & 0x7 as libc::c_int as libc::c_uint
+            != 0x3 as libc::c_int as libc::c_uint
         {}
         val = rv_readl(0x7010250 as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xfffffffe as libc::c_uint;
-        rv_writel(val, 0x7010250 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x7010250 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         sdelay(10 as libc::c_int as libc::c_ulong);
         val = rv_readl(0x3103004 as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xfffffffe as libc::c_uint;
-        rv_writel(val, 0x3103004 as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x3103004 as libc::c_int as intptr_t as *mut libc::c_void,
+        );
         while rv_readl(0x3103018 as libc::c_int as intptr_t as *const libc::c_void)
-            & 0x7 as libc::c_int as libc::c_uint != 0x1 as libc::c_int as libc::c_uint
+            & 0x7 as libc::c_int as libc::c_uint
+            != 0x1 as libc::c_int as libc::c_uint
         {}
         sdelay(15 as libc::c_int as libc::c_ulong);
         if dqs_gating_mode == 1 as libc::c_int as libc::c_uint {
             val = rv_readl(0x3103108 as libc::c_int as intptr_t as *const libc::c_void);
             val &= 0xffffff3f as libc::c_uint;
-            rv_writel(val, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+            rv_writel(
+                val,
+                0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+            );
             val = rv_readl(0x310310c as libc::c_int as intptr_t as *const libc::c_void);
             val &= 0xf9ffffff as libc::c_uint;
             val |= 0x2000000 as libc::c_int as libc::c_uint;
-            rv_writel(val, 0x310310c as libc::c_int as intptr_t as *mut libc::c_void);
+            rv_writel(
+                val,
+                0x310310c as libc::c_int as intptr_t as *mut libc::c_void,
+            );
             sdelay(1 as libc::c_int as libc::c_ulong);
             rv_writel(
                 0x401 as libc::c_int as u32_0,
                 0x3103000 as libc::c_int as intptr_t as *mut libc::c_void,
             );
             while rv_readl(0x3103010 as libc::c_int as intptr_t as *const libc::c_void)
-                & 0x1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
+                & 0x1 as libc::c_int as libc::c_uint
+                == 0 as libc::c_int as libc::c_uint
             {}
         }
     }
@@ -1773,28 +1878,44 @@ pub unsafe extern "C" fn mctl_channel_init(
         return 0 as libc::c_int as libc::c_uint;
     }
     while rv_readl(0x3103018 as libc::c_int as intptr_t as *const libc::c_void)
-        & 0x1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
+        & 0x1 as libc::c_int as libc::c_uint
+        == 0 as libc::c_int as libc::c_uint
     {}
     val = rv_readl(0x310308c as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x80000000 as libc::c_uint;
-    rv_writel(val, 0x310308c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x310308c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(10 as libc::c_int as libc::c_ulong);
     val = rv_readl(0x310308c as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0x7fffffff as libc::c_int as libc::c_uint;
-    rv_writel(val, 0x310308c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x310308c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(10 as libc::c_int as libc::c_ulong);
     val = rv_readl(0x3102014 as libc::c_int as intptr_t as *const libc::c_void);
     val |= 0x80000000 as libc::c_uint;
-    rv_writel(val, 0x3102014 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x3102014 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     sdelay(10 as libc::c_int as libc::c_ulong);
     val = rv_readl(0x310310c as libc::c_int as intptr_t as *const libc::c_void);
     val &= 0xf9ffffff as libc::c_uint;
-    rv_writel(val, 0x310310c as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        val,
+        0x310310c as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     if dqs_gating_mode == 1 as libc::c_int as libc::c_uint {
         val = rv_readl(0x310311c as libc::c_int as intptr_t as *const libc::c_void);
         val &= 0xffffff3f as libc::c_uint;
         val |= 0x40 as libc::c_int as libc::c_uint;
-        rv_writel(val, 0x310311c as libc::c_int as intptr_t as *mut libc::c_void);
+        rv_writel(
+            val,
+            0x310311c as libc::c_int as intptr_t as *mut libc::c_void,
+        );
     }
     return 1 as libc::c_int as libc::c_uint;
 }
@@ -1804,14 +1925,11 @@ pub unsafe extern "C" fn DRAMC_get_dram_size() -> libc::c_int {
     let mut temp: libc::c_uint = 0;
     let mut size0: libc::c_uint = 0;
     let mut size1: libc::c_uint = 0;
-    rval = rv_readl(
-        0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void,
-    );
+    rval =
+        rv_readl(0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void);
     temp = rval >> 8 as libc::c_int & 0xf as libc::c_int as libc::c_uint;
-    temp = temp
-        .wrapping_add(rval >> 4 as libc::c_int & 0xf as libc::c_int as libc::c_uint);
-    temp = temp
-        .wrapping_add(rval >> 2 as libc::c_int & 0x3 as libc::c_int as libc::c_uint);
+    temp = temp.wrapping_add(rval >> 4 as libc::c_int & 0xf as libc::c_int as libc::c_uint);
+    temp = temp.wrapping_add(rval >> 2 as libc::c_int & 0x3 as libc::c_int as libc::c_uint);
     temp = temp.wrapping_sub(14 as libc::c_int as libc::c_uint);
     size0 = ((1 as libc::c_int) << temp) as libc::c_uint;
     temp = rval & 0x3 as libc::c_int as libc::c_uint;
@@ -1819,18 +1937,16 @@ pub unsafe extern "C" fn DRAMC_get_dram_size() -> libc::c_int {
         return size0 as libc::c_int;
     }
     rval = rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x4 as libc::c_int as isize) as intptr_t as *const libc::c_void,
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x4 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
     );
     temp = rval & 0x3 as libc::c_int as libc::c_uint;
     if temp == 0 as libc::c_int as libc::c_uint {
         return (2 as libc::c_int as libc::c_uint).wrapping_mul(size0) as libc::c_int;
     }
     temp = rval >> 8 as libc::c_int & 0xf as libc::c_int as libc::c_uint;
-    temp = temp
-        .wrapping_add(rval >> 4 as libc::c_int & 0xf as libc::c_int as libc::c_uint);
-    temp = temp
-        .wrapping_add(rval >> 2 as libc::c_int & 0x3 as libc::c_int as libc::c_uint);
+    temp = temp.wrapping_add(rval >> 4 as libc::c_int & 0xf as libc::c_int as libc::c_uint);
+    temp = temp.wrapping_add(rval >> 2 as libc::c_int & 0x3 as libc::c_int as libc::c_uint);
     temp = temp.wrapping_sub(14 as libc::c_int as libc::c_uint);
     size1 = ((1 as libc::c_int) << temp) as libc::c_uint;
     return size0.wrapping_add(size1) as libc::c_int;
@@ -1841,20 +1957,21 @@ pub unsafe extern "C" fn dqs_gate_detect(mut para: *mut dram_para_t) -> libc::c_
     let mut dx0: libc::c_uint = 0;
     let mut dx1: libc::c_uint = 0;
     if rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x1010 as libc::c_int as isize) as intptr_t as *const libc::c_void,
-    ) & ((1 as libc::c_int) << 22 as libc::c_int) as libc::c_uint != 0
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x1010 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
+    ) & ((1 as libc::c_int) << 22 as libc::c_int) as libc::c_uint
+        != 0
     {
         dx0 = rv_readl(
-            (0x3102000 as libc::c_int as *mut libc::c_char)
-                .offset(0x1348 as libc::c_int as isize) as intptr_t
-                as *const libc::c_void,
-        ) >> 24 as libc::c_int & 0x3 as libc::c_int as libc::c_uint;
+            (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x1348 as libc::c_int as isize)
+                as intptr_t as *const libc::c_void,
+        ) >> 24 as libc::c_int
+            & 0x3 as libc::c_int as libc::c_uint;
         dx1 = rv_readl(
-            (0x3102000 as libc::c_int as *mut libc::c_char)
-                .offset(0x13c8 as libc::c_int as isize) as intptr_t
-                as *const libc::c_void,
-        ) >> 24 as libc::c_int & 0x3 as libc::c_int as libc::c_uint;
+            (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x13c8 as libc::c_int as isize)
+                as intptr_t as *const libc::c_void,
+        ) >> 24 as libc::c_int
+            & 0x3 as libc::c_int as libc::c_uint;
         if dx0 == 2 as libc::c_int as libc::c_uint {
             rval = (*para).dram_para2;
             rval &= 0xffff0ff0 as libc::c_uint;
@@ -1869,8 +1986,7 @@ pub unsafe extern "C" fn dqs_gate_detect(mut para: *mut dram_para_t) -> libc::c_
             }
             (*para).dram_para2 = rval;
             printf(
-                b"[AUTO DEBUG] single rank and full DQ!\n\0" as *const u8
-                    as *const libc::c_char,
+                b"[AUTO DEBUG] single rank and full DQ!\n\0" as *const u8 as *const libc::c_char,
             );
             return 1 as libc::c_int;
         } else if dx0 == 0 as libc::c_int as libc::c_uint {
@@ -1878,15 +1994,10 @@ pub unsafe extern "C" fn dqs_gate_detect(mut para: *mut dram_para_t) -> libc::c_
             rval &= 0xfffffff0 as libc::c_uint;
             rval |= 0x1001 as libc::c_int as libc::c_uint;
             (*para).dram_para2 = rval;
-            printf(
-                b"[AUTO DEBUG] dual rank and half DQ!\n\0" as *const u8
-                    as *const libc::c_char,
-            );
+            printf(b"[AUTO DEBUG] dual rank and half DQ!\n\0" as *const u8 as *const libc::c_char);
             return 1 as libc::c_int;
         } else {
-            if (*para).dram_tpr13
-                & ((1 as libc::c_int) << 29 as libc::c_int) as libc::c_uint != 0
-            {
+            if (*para).dram_tpr13 & ((1 as libc::c_int) << 29 as libc::c_int) as libc::c_uint != 0 {
                 printf(b"DX0 state:%d\n\0" as *const u8 as *const libc::c_char, dx0);
                 printf(b"DX1 state:%d\n\0" as *const u8 as *const libc::c_char, dx1);
             }
@@ -1897,9 +2008,7 @@ pub unsafe extern "C" fn dqs_gate_detect(mut para: *mut dram_para_t) -> libc::c_
         rval &= 0xfffffff0 as libc::c_uint;
         rval |= 0x1000 as libc::c_int as libc::c_uint;
         (*para).dram_para2 = rval;
-        printf(
-            b"[AUTO DEBUG] two rank and full DQ!\n\0" as *const u8 as *const libc::c_char,
-        );
+        printf(b"[AUTO DEBUG] two rank and full DQ!\n\0" as *const u8 as *const libc::c_char);
         return 1 as libc::c_int;
     };
 }
@@ -1942,8 +2051,7 @@ pub unsafe extern "C" fn dramc_simple_wr_test(
             return 1 as libc::c_int;
         }
         v1 = rv_readl(
-            addr.offset(offs as isize).offset(i as isize) as intptr_t
-                as *const libc::c_void,
+            addr.offset(offs as isize).offset(i as isize) as intptr_t as *const libc::c_void
         );
         v2 = patt2.wrapping_add(i);
         if v1 != v2 {
@@ -1968,15 +2076,14 @@ pub unsafe extern "C" fn mctl_vrefzq_init(mut para: *mut dram_para_t) {
         == 0 as libc::c_int as libc::c_uint
     {
         val = rv_readl(
-            (0x3102000 as libc::c_int as *mut libc::c_char)
-                .offset(0x1110 as libc::c_int as isize) as intptr_t
-                as *const libc::c_void,
+            (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x1110 as libc::c_int as isize)
+                as intptr_t as *const libc::c_void,
         ) & 0x80808080 as libc::c_uint;
         val |= (*para).dram_tpr5;
         rv_writel(
             val,
-            (0x3102000 as libc::c_int as *mut libc::c_char)
-                .offset(0x1110 as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+            (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x1110 as libc::c_int as isize)
+                as intptr_t as *mut libc::c_void,
         );
         if (*para).dram_tpr13 & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
             == 0 as libc::c_int as libc::c_uint
@@ -2020,8 +2127,7 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
     let mut banks: libc::c_uint = 0;
     if mctl_core_init(para) == 0 as libc::c_int {
         printf(
-            b"[ERROR DEBUG] DRAM initialisation error : 0!\n\0" as *const u8
-                as *const libc::c_char,
+            b"[ERROR DEBUG] DRAM initialisation error : 0!\n\0" as *const u8 as *const libc::c_char,
         );
         return 0 as libc::c_int;
     }
@@ -2036,7 +2142,11 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
     ptr = 0x40000000 as libc::c_int as libc::c_uint;
     while i < 64 as libc::c_int as libc::c_uint {
         rv_writel(
-            if i & 1 as libc::c_int as libc::c_uint != 0 { ptr } else { !ptr },
+            if i & 1 as libc::c_int as libc::c_uint != 0 {
+                ptr
+            } else {
+                !ptr
+            },
             ptr as intptr_t as *mut libc::c_void,
         );
         i = i.wrapping_add(1);
@@ -2052,8 +2162,7 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
         i = 11 as libc::c_int as libc::c_uint;
         's_96: while i < 17 as libc::c_int as libc::c_uint {
             chk = (0x40000000 as libc::c_int
-                + ((1 as libc::c_int)
-                    << i.wrapping_add(11 as libc::c_int as libc::c_uint)))
+                + ((1 as libc::c_int) << i.wrapping_add(11 as libc::c_int as libc::c_uint)))
                 as libc::c_uint;
             ptr = 0x40000000 as libc::c_int as libc::c_uint;
             j = 0 as libc::c_int as libc::c_uint;
@@ -2091,15 +2200,13 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
         (*para).dram_para1 = rval;
         if rank == 1 as libc::c_int as libc::c_uint {
             rval = rv_readl(
-                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t
-                    as *const libc::c_void,
+                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void,
             );
             rval &= 0xfffff003 as libc::c_uint;
             rval |= 0x6a4 as libc::c_int as libc::c_uint;
             rv_writel(
                 rval,
-                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t
-                    as *mut libc::c_void,
+                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *mut libc::c_void,
             );
         }
         rval = rv_readl(mc_work_mode as intptr_t as *const libc::c_void);
@@ -2107,14 +2214,18 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
         rval |= 0x6a4 as libc::c_int as libc::c_uint;
         rv_writel(rval, mc_work_mode as intptr_t as *mut libc::c_void);
         while rv_readl(mc_work_mode as intptr_t as *const libc::c_void) != rval {}
-        chk = (0x40000000 as libc::c_int + ((1 as libc::c_int) << 22 as libc::c_int))
-            as libc::c_uint;
+        chk =
+            (0x40000000 as libc::c_int + ((1 as libc::c_int) << 22 as libc::c_int)) as libc::c_uint;
         ptr = 0x40000000 as libc::c_int as libc::c_uint;
         i = 0 as libc::c_int as libc::c_uint;
         j = 0 as libc::c_int as libc::c_uint;
         while i < 64 as libc::c_int as libc::c_uint {
             if rv_readl(chk as intptr_t as *const libc::c_void)
-                != (if i & 1 as libc::c_int as libc::c_uint != 0 { ptr } else { !ptr })
+                != (if i & 1 as libc::c_int as libc::c_uint != 0 {
+                    ptr
+                } else {
+                    !ptr
+                })
             {
                 j = 1 as libc::c_int as libc::c_uint;
                 break;
@@ -2137,15 +2248,13 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
         (*para).dram_para1 = rval;
         if rank == 1 as libc::c_int as libc::c_uint {
             rval = rv_readl(
-                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t
-                    as *const libc::c_void,
+                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *const libc::c_void,
             );
             rval &= 0xfffff003 as libc::c_uint;
             rval |= 0xaa0 as libc::c_int as libc::c_uint;
             rv_writel(
                 rval,
-                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t
-                    as *mut libc::c_void,
+                0x3102000 as libc::c_int as *mut libc::c_char as intptr_t as *mut libc::c_void,
             );
         }
         rval = rv_readl(mc_work_mode as intptr_t as *const libc::c_void);
@@ -2155,8 +2264,7 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
         while rv_readl(mc_work_mode as intptr_t as *const libc::c_void) != rval {}
         i = 9 as libc::c_int as libc::c_uint;
         's_364: while i < 14 as libc::c_int as libc::c_uint {
-            chk = (0x40000000 as libc::c_int + ((1 as libc::c_int) << i))
-                as libc::c_uint;
+            chk = (0x40000000 as libc::c_int + ((1 as libc::c_int) << i)) as libc::c_uint;
             ptr = 0x40000000 as libc::c_int as libc::c_uint;
             j = 0 as libc::c_int as libc::c_uint;
             loop {
@@ -2187,8 +2295,7 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
             (1 as libc::c_int) << i.wrapping_sub(10 as libc::c_int as libc::c_uint)
         };
         printf(
-            b"[AUTO DEBUG] rank %d page size = %d KB\n\0" as *const u8
-                as *const libc::c_char,
+            b"[AUTO DEBUG] rank %d page size = %d KB\n\0" as *const u8 as *const libc::c_char,
             rank,
             pgsize,
         );
@@ -2236,37 +2343,30 @@ pub unsafe extern "C" fn auto_scan_dram_size(mut para: *mut dram_para_t) -> libc
         if rval & 0xffff as libc::c_int as libc::c_uint
             == rval >> 16 as libc::c_int & 0xffff as libc::c_int as libc::c_uint
         {
-            printf(
-                b"rank1 config same as rank0\n\0" as *const u8 as *const libc::c_char,
-            );
+            printf(b"rank1 config same as rank0\n\0" as *const u8 as *const libc::c_char);
         } else {
             (*para).dram_para2 |= 0x100 as libc::c_int as libc::c_uint;
-            printf(
-                b"rank1 config different from rank0\n\0" as *const u8
-                    as *const libc::c_char,
-            );
+            printf(b"rank1 config different from rank0\n\0" as *const u8 as *const libc::c_char);
         }
     }
     return 1 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn auto_scan_dram_rank_width(
-    mut para: *mut dram_para_t,
-) -> libc::c_int {
+pub unsafe extern "C" fn auto_scan_dram_rank_width(mut para: *mut dram_para_t) -> libc::c_int {
     let mut s1: libc::c_uint = (*para).dram_tpr13;
     let mut s2: libc::c_uint = (*para).dram_para1;
     let mut v: libc::c_uint = 0;
     (*para).dram_para1 = 0xb000b0 as libc::c_int as libc::c_uint;
-    v = (*para).dram_para2 & 0xfffffff0 as libc::c_uint
-        | 0x1000 as libc::c_int as libc::c_uint;
+    v = (*para).dram_para2 & 0xfffffff0 as libc::c_uint | 0x1000 as libc::c_int as libc::c_uint;
     (*para).dram_para2 = v;
     v = s1 & 0xfffffff7 as libc::c_uint | 0x5 as libc::c_int as libc::c_uint;
     (*para).dram_tpr13 = v;
     mctl_core_init(para);
     if rv_readl(
-        (0x3102000 as libc::c_int as *mut libc::c_char)
-            .offset(0x1010 as libc::c_int as isize) as intptr_t as *const libc::c_void,
-    ) & ((1 as libc::c_int) << 20 as libc::c_int) as libc::c_uint != 0
+        (0x3102000 as libc::c_int as *mut libc::c_char).offset(0x1010 as libc::c_int as isize)
+            as intptr_t as *const libc::c_void,
+    ) & ((1 as libc::c_int) << 20 as libc::c_int) as libc::c_uint
+        != 0
     {
         return 0 as libc::c_int;
     }
@@ -2278,9 +2378,7 @@ pub unsafe extern "C" fn auto_scan_dram_rank_width(
     return 1 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn auto_scan_dram_config(
-    mut para: *mut dram_para_t,
-) -> libc::c_int {
+pub unsafe extern "C" fn auto_scan_dram_config(mut para: *mut dram_para_t) -> libc::c_int {
     if (*para).dram_tpr13 & ((1 as libc::c_int) << 14 as libc::c_int) as libc::c_uint
         == 0 as libc::c_int as libc::c_uint
         && auto_scan_dram_rank_width(para) == 0 as libc::c_int
@@ -2296,8 +2394,7 @@ pub unsafe extern "C" fn auto_scan_dram_config(
         && auto_scan_dram_size(para) == 0 as libc::c_int
     {
         printf(
-            b"[ERROR DEBUG] auto scan dram size failed !\n\0" as *const u8
-                as *const libc::c_char,
+            b"[ERROR DEBUG] auto scan dram size failed !\n\0" as *const u8 as *const libc::c_char,
         );
         return 0 as libc::c_int;
     }
@@ -2315,63 +2412,53 @@ pub unsafe extern "C" fn init_DRAM(
 ) -> libc::c_int {
     let mut rc: libc::c_int = 0;
     let mut mem_size: libc::c_int = 0;
-    if (*para).dram_tpr13 & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
-        != 0
-    {
+    if (*para).dram_tpr13 & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint != 0 {
         printf(b"DRAM only have internal ZQ!!\n\0" as *const u8 as *const libc::c_char);
         rv_writel(
             rv_readl(
-                (0x7010000 as libc::c_uint)
-                    .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                    as *const libc::c_void,
+                (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                    as intptr_t as *const libc::c_void,
             ) | 0x100 as libc::c_int as libc::c_uint,
-            (0x7010000 as libc::c_uint)
-                .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                as *mut libc::c_void,
+            (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                as intptr_t as *mut libc::c_void,
         );
         rv_writel(
             0 as libc::c_int as u32_0,
-            (0x3000000 as libc::c_int as *mut libc::c_char)
-                .offset(0x16e as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+            (0x3000000 as libc::c_int as *mut libc::c_char).offset(0x16e as libc::c_int as isize)
+                as intptr_t as *mut libc::c_void,
         );
         sdelay(10 as libc::c_int as libc::c_ulong);
     } else {
         rv_writel(
             0 as libc::c_int as u32_0,
-            (0x7010000 as libc::c_int as *mut libc::c_char)
-                .offset(0x254 as libc::c_int as isize) as intptr_t as *mut libc::c_void,
+            (0x7010000 as libc::c_int as *mut libc::c_char).offset(0x254 as libc::c_int as isize)
+                as intptr_t as *mut libc::c_void,
         );
         rv_writel(
             rv_readl(
-                (0x7010000 as libc::c_uint)
-                    .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                    as *const libc::c_void,
+                (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                    as intptr_t as *const libc::c_void,
             ) & !(0x3 as libc::c_int) as libc::c_uint,
-            (0x7010000 as libc::c_uint)
-                .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                as *mut libc::c_void,
+            (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                as intptr_t as *mut libc::c_void,
         );
         sdelay(10 as libc::c_int as libc::c_ulong);
         rv_writel(
             rv_readl(
-                (0x7010000 as libc::c_uint)
-                    .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                    as *const libc::c_void,
+                (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                    as intptr_t as *const libc::c_void,
             ) & !(0x108 as libc::c_int) as libc::c_uint,
-            (0x7010000 as libc::c_uint)
-                .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                as *mut libc::c_void,
+            (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                as intptr_t as *mut libc::c_void,
         );
         sdelay(10 as libc::c_int as libc::c_ulong);
         rv_writel(
             rv_readl(
-                (0x7010000 as libc::c_uint)
-                    .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                    as *const libc::c_void,
+                (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                    as intptr_t as *const libc::c_void,
             ) | 0x1 as libc::c_int as libc::c_uint,
-            (0x7010000 as libc::c_uint)
-                .wrapping_add(0x310 as libc::c_int as libc::c_uint) as intptr_t
-                as *mut libc::c_void,
+            (0x7010000 as libc::c_uint).wrapping_add(0x310 as libc::c_int as libc::c_uint)
+                as intptr_t as *mut libc::c_void,
         );
         sdelay(20 as libc::c_int as libc::c_ulong);
         printf(
@@ -2384,7 +2471,10 @@ pub unsafe extern "C" fn init_DRAM(
         );
     }
     rc = get_pmu_exists();
-    printf(b"get_pmu_exist() = %d\n\0" as *const u8 as *const libc::c_char, rc);
+    printf(
+        b"get_pmu_exist() = %d\n\0" as *const u8 as *const libc::c_char,
+        rc,
+    );
     if rc < 0 as libc::c_int {
         dram_vol_set(para);
     } else if (*para).dram_type == 2 as libc::c_int as libc::c_uint {
@@ -2392,9 +2482,7 @@ pub unsafe extern "C" fn init_DRAM(
     } else if (*para).dram_type == 3 as libc::c_int as libc::c_uint {
         set_ddr_voltage(1500 as libc::c_int);
     }
-    if (*para).dram_tpr13 & 0x1 as libc::c_int as libc::c_uint
-        == 0 as libc::c_int as libc::c_uint
-    {
+    if (*para).dram_tpr13 & 0x1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint {
         if auto_scan_dram_config(para) == 0 as libc::c_int {
             return 0 as libc::c_int;
         }
@@ -2411,8 +2499,7 @@ pub unsafe extern "C" fn init_DRAM(
         b"DRAM Type = %d (2:DDR2,3:DDR3)\n\0" as *const u8 as *const libc::c_char,
         (*para).dram_type,
     );
-    if (*para).dram_odt_en & 0x1 as libc::c_int as libc::c_uint
-        == 0 as libc::c_int as libc::c_uint
+    if (*para).dram_odt_en & 0x1 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
     {
         printf(b"DRAMC read ODT  off.\n\0" as *const u8 as *const libc::c_char);
     } else {
@@ -2425,32 +2512,32 @@ pub unsafe extern "C" fn init_DRAM(
     if rc & 0x44 as libc::c_int == 0 as libc::c_int {
         printf(b"DRAM ODT off.\n\0" as *const u8 as *const libc::c_char);
     } else {
-        printf(b"DRAM ODT value: 0x%x.\n\0" as *const u8 as *const libc::c_char, rc);
+        printf(
+            b"DRAM ODT value: 0x%x.\n\0" as *const u8 as *const libc::c_char,
+            rc,
+        );
     }
     if mctl_core_init(para) == 0 as libc::c_int {
-        printf(
-            b"DRAM initialisation error : 1 !\n\0" as *const u8 as *const libc::c_char,
-        );
+        printf(b"DRAM initialisation error : 1 !\n\0" as *const u8 as *const libc::c_char);
         return 0 as libc::c_int;
     }
     rc = (*para).dram_para2 as libc::c_int;
     if rc < 0 as libc::c_int {
-        rc = ((rc as libc::c_uint & 0x7fff0000 as libc::c_uint) >> 16 as libc::c_int)
-            as libc::c_int;
+        rc =
+            ((rc as libc::c_uint & 0x7fff0000 as libc::c_uint) >> 16 as libc::c_int) as libc::c_int;
     } else {
         rc = DRAMC_get_dram_size();
-        printf(b"DRAM SIZE =%d M\n\0" as *const u8 as *const libc::c_char, rc);
-        (*para)
-            .dram_para2 = (*para).dram_para2 & 0xffff as libc::c_uint
-            | (rc << 16 as libc::c_int) as libc::c_uint;
+        printf(
+            b"DRAM SIZE =%d M\n\0" as *const u8 as *const libc::c_char,
+            rc,
+        );
+        (*para).dram_para2 =
+            (*para).dram_para2 & 0xffff as libc::c_uint | (rc << 16 as libc::c_int) as libc::c_uint;
     }
     mem_size = rc;
-    if (*para).dram_tpr13 & ((1 as libc::c_int) << 30 as libc::c_int) as libc::c_uint
-        != 0
-    {
+    if (*para).dram_tpr13 & ((1 as libc::c_int) << 30 as libc::c_int) as libc::c_uint != 0 {
         rc = rv_readl(
-            &mut (*para).dram_tpr8 as *mut libc::c_uint as intptr_t
-                as *const libc::c_void,
+            &mut (*para).dram_tpr8 as *mut libc::c_uint as intptr_t as *const libc::c_void,
         ) as libc::c_int;
         if rc == 0 as libc::c_int {
             rc = 0x10000200 as libc::c_int;
@@ -2483,8 +2570,7 @@ pub unsafe extern "C" fn init_DRAM(
     }
     rc = (rv_readl(0x3103100 as libc::c_int as intptr_t as *const libc::c_void)
         & !(0xf000 as libc::c_int) as libc::c_uint) as libc::c_int;
-    if (*para).dram_tpr13 & 0x200 as libc::c_int as libc::c_uint
-        == 0 as libc::c_int as libc::c_uint
+    if (*para).dram_tpr13 & 0x200 as libc::c_int as libc::c_uint == 0 as libc::c_int as libc::c_uint
     {
         if (*para).dram_type != 6 as libc::c_int as libc::c_uint {
             rv_writel(
@@ -2503,24 +2589,23 @@ pub unsafe extern "C" fn init_DRAM(
             | ((1 as libc::c_int) << 31 as libc::c_int) as libc::c_uint,
         0x3103140 as libc::c_int as intptr_t as *mut libc::c_void,
     );
-    if (*para).dram_tpr13 & ((1 as libc::c_int) << 8 as libc::c_int) as libc::c_uint != 0
-    {
+    if (*para).dram_tpr13 & ((1 as libc::c_int) << 8 as libc::c_int) as libc::c_uint != 0 {
         rv_writel(
             rv_readl(0x3103140 as libc::c_int as intptr_t as *const libc::c_void)
                 | 0x300 as libc::c_int as libc::c_uint,
             0x31030b8 as libc::c_int as intptr_t as *mut libc::c_void,
         );
     }
-    rc = rv_readl(0x3103108 as libc::c_int as intptr_t as *const libc::c_void)
-        as libc::c_int;
-    if (*para).dram_tpr13 & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint
-        != 0
-    {
+    rc = rv_readl(0x3103108 as libc::c_int as intptr_t as *const libc::c_void) as libc::c_int;
+    if (*para).dram_tpr13 & ((1 as libc::c_int) << 16 as libc::c_int) as libc::c_uint != 0 {
         rc = (rc as libc::c_uint & 0xffffdfff as libc::c_uint) as libc::c_int;
     } else {
         rc |= 0x2000 as libc::c_int;
     }
-    rv_writel(rc as u32_0, 0x3103108 as libc::c_int as intptr_t as *mut libc::c_void);
+    rv_writel(
+        rc as u32_0,
+        0x3103108 as libc::c_int as intptr_t as *mut libc::c_void,
+    );
     if (*para).dram_type == 7 as libc::c_int as libc::c_uint {
         rc = (rv_readl(0x310307c as libc::c_int as intptr_t as *const libc::c_void)
             & 0xfff0ffff as libc::c_uint) as libc::c_int;
@@ -2531,11 +2616,8 @@ pub unsafe extern "C" fn init_DRAM(
         );
     }
     dram_enable_all_master();
-    if (*para).dram_tpr13 & ((1 as libc::c_int) << 28 as libc::c_int) as libc::c_uint
-        != 0
-    {
-        rc = rv_readl(0x70005d4 as libc::c_int as intptr_t as *const libc::c_void)
-            as libc::c_int;
+    if (*para).dram_tpr13 & ((1 as libc::c_int) << 28 as libc::c_int) as libc::c_uint != 0 {
+        rc = rv_readl(0x70005d4 as libc::c_int as intptr_t as *const libc::c_void) as libc::c_int;
         if rc & (1 as libc::c_int) << 16 as libc::c_int != 0
             || dramc_simple_wr_test(mem_size as libc::c_uint, 4096 as libc::c_int) != 0
         {
