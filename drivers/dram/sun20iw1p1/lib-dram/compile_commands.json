@@ -1,0 +1,7 @@
+[
+    {
+        "command": "cc -c -I/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/include -I/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/include/arch/riscv/ -I/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/include/configs/ -I/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/include/arch/sun20iw1p1/ -I/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/include/openssl/ -I/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/libfdt -g -Os -fno-common -ffunction-sections -fno-builtin -ffreestanding -D__KERNEL__ -target riscv64 -mabi=lp64 -fno-stack-protector -Wall -Werror -Wstrict-prototypes -Wno-format-security -Wno-format-nonliteral -fno-delete-null-pointer-checks -pipe -o mctl_hal_.o mctl_hal.c",
+        "directory": "/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/drivers/dram/sun20iw1p1/lib-dram",
+        "file": "/home/dama/firmware/Allwinner/D1/sun20i_d1_spl/drivers/dram/sun20iw1p1/lib-dram/mctl_hal.c"
+    }
+]
