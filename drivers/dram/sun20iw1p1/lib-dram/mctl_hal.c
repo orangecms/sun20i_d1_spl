@@ -1674,7 +1674,7 @@ signed int init_DRAM(int type, dram_para_t *para) // s0
 	if (para->dram_tpr13 & (1 << 16)) {
 		printf("DRAM only have internal ZQ!!\n");
 		writel(RES_CAL_CTRL_REG, readl(RES_CAL_CTRL_REG) | 0x100 );
-		writel(ZQ_INTERNAL, 0); // TODO: correct name?
+		writel(RES240_CTRL_REG, 0); // TODO: correct name?
 		sdelay(10);
 	}
 	else {
